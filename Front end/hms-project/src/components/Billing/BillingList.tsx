@@ -1,278 +1,392 @@
-import React, { useState } from 'react';
-import { CreditCard, Calendar, User, Download, CheckCircle } from 'lucide-react';
-import { mockBills, mockPatients } from '../../data/mockData';
-import { useAuth } from '../../context/AuthContext';
-import { Bill } from '../../types';
+import React, { useState, useEffect } from "react";
+import BillingService from "../../services/BillingService";
+import { Grid, Table, Edit, Trash2, Plus } from "lucide-react";
 
-const BillingList: React.FC = () => {
-  const { user } = useAuth();
-  const [selectedBill, setSelectedBill] = useState<Bill | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  
-  // Filter bills based on user role
-  const filteredBills = mockBills.filter(bill => {
-    if (user?.role === 'patient') {
-      return bill.patientId === user.id;
-    }
-    return true; // Admin and doctors see all
+interface Billing {
+  billID: number;
+  patientID: number;
+  amount: number;
+  paymentStatus: string;
+  paymentMethod: string;
+  billingStatus: string;
+  createdBy: number;
+}
+const ViewAllBilling: React.FC = () => {
+  const [billings, setBillings] = useState<Billing[]>([]);
+  const [viewMode, setViewMode] = useState<"table" | "card">("table");
+  const [selectedBilling, setSelectedBilling] = useState<Billing | null>(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
+  const [errors, setErrors] = useState<string[]>([]);
+
+  useEffect(() => {
+    BillingService.getAllBillings()
+      .then(response => {
+        setBillings(response.data);
+        console.log(response.data);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  }, []);
+
+  const [billingData, setBillingData] = useState<Billing>({
+    billID: 0,
+    patientID: 0,
+    amount: 0,
+    paymentStatus: "",
+    paymentMethod: "",
+    billingStatus: "",
+    createdBy: 0,
   });
-  
-  // Apply search filter
-  const searchedBills = filteredBills.filter(bill => {
-    const patient = mockPatients.find(p => p.id === bill.patientId);
-    
-    const searchString = `${patient?.name} ${bill.id} ${bill.status}`.toLowerCase();
-    return searchString.includes(searchTerm.toLowerCase());
-  });
-  
-  const handleViewBill = (bill: Bill) => {
-    setSelectedBill(bill);
+
+  const handleEdit = (billing: Billing) => {
+    setSelectedBilling(billing);
+    setBillingData(billing);
   };
-  
+
+  const handleDelete = (billID: number) => {
+    console.log(`Delete billing with ID: ${billID}`);
+    BillingService.deleteBilling(billID);
+    window.location.reload();
+  };
+
   const closeModal = () => {
-    setSelectedBill(null);
+    setSelectedBilling(null);
+    setIsAddModalOpen(false);
+    setErrors([]);
+  };
+
+  const handleRegisterChange = (e: { target: { name: any; value: any; }; }) => {
+    setBillingData({ ...billingData, [e.target.name]: e.target.value });
+  };
+
+  const handleUpdateChange = (e: { target: { name: any; value: any; }; }) => {
+    setBillingData({ ...billingData, [e.target.name]: e.target.value });
+  };
+  const validateForm = () : string[]=> {
+    const errorsList: string[] = [];
+    if (!billingData.patientID) errorsList.push("Patient ID is required.");
+    if (!billingData.amount || billingData.amount <= 0) errorsList.push("Amount must be a positive number.");
+    if (!billingData.paymentStatus.trim()) errorsList.push("Payment status is required.");
+    if (!billingData.paymentMethod.trim()) errorsList.push("Payment method is required.");
+    if (!billingData.billingStatus.trim()) errorsList.push("Billing status is required.");
+    return errorsList;
+  };
+
+  const handleUpdateSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    const validationErrors = validateForm();
+    if (validationErrors.length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+    BillingService.updateBilling(billingData, billingData.billID);
+    console.log("Update Form submitted");
+    closeModal();
+    window.location.reload();
+  };
+
+  const handleRegisterSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    const validationErrors = validateForm();
+    if (validationErrors.length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+    BillingService.registerBilling(billingData);
+    console.log("Register Form submitted");
+    closeModal();
+    window.location.reload();
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Billing</h1>
-        <p className="mt-1 text-sm text-gray-500">
-          View and manage billing information
-        </p>
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4">All Billings</h1>
+      <div className="flex justify-end mb-4">
+        <button
+          className={"mr-2 text-green-700"}
+          onClick={() => setIsAddModalOpen(true)}
+        >
+          <Plus size={24} />
+        </button>
+        <button
+          className={`mr-2 ${viewMode === "table" ? "text-blue-600" : "text-gray-600"}`}
+          onClick={() => setViewMode("table")}
+        >
+          <Table size={24} />
+        </button>
+        <button
+          className={`${viewMode === "card" ? "text-blue-600" : "text-gray-600"}`}
+          onClick={() => setViewMode("card")}
+        >
+          <Grid size={24} className="mr-2" />
+        </button>
       </div>
-      
-      {/* Search and Filter */}
-      <div className="bg-white shadow rounded-lg p-4">
-        <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <CreditCard className="h-5 w-5 text-gray-400" />
-          </div>
-          <input
-            type="text"
-            placeholder="Search bills by patient, ID, status..."
-            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-      </div>
-      
-      {/* Bills List */}
-      <div className="bg-white shadow rounded-lg overflow-hidden">
-        <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
-          <h3 className="text-lg leading-6 font-medium text-gray-900">
-            {user?.role === 'patient' ? 'Your Bills' : 'Patient Bills'}
-          </h3>
-        </div>
-        
-        {searchedBills.length > 0 ? (
-          <div className="divide-y divide-gray-200">
-            {searchedBills.map((bill) => {
-              const patient = mockPatients.find(p => p.id === bill.patientId);
-              
-              return (
-                <div key={bill.id} className="px-4 py-4 sm:px-6 hover:bg-gray-50">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium text-primary-600 truncate">
-                      {user?.role === 'patient' ? 
-                        `Bill #${bill.id.substring(0, 8)}` : 
-                        `${patient?.name} - Bill #${bill.id.substring(0, 8)}`}
-                    </p>
-                    <div className="ml-2 flex-shrink-0 flex">
-                      <p className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        bill.status === 'paid' ? 'bg-green-100 text-green-800' : 
-                        bill.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
-                        'bg-red-100 text-red-800'
-                      }`}>
-                        {bill.status.charAt(0).toUpperCase() + bill.status.slice(1)}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="mt-2 sm:flex sm:justify-between">
-                    <div className="sm:flex">
-                      <p className="flex items-center text-sm text-gray-500">
-                        <Calendar className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" />
-                        {bill.date}
-                      </p>
-                      <p className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-6">
-                        <CreditCard className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" />
-                        Due: {bill.dueDate}
-                      </p>
-                    </div>
+      {viewMode === "table" ? (
+        <div className="overflow-x-auto rounded-lg">
+          <table className="min-w-full bg-white rounded-lg">
+            <thead className="bg-secondary-200 rounded-t-lg">
+              <tr>
+                <th className="py-2 px-4 border-b">Bill ID</th>
+                <th className="py-2 px-4 border-b">Patient ID</th>
+                <th className="py-2 px-4 border-b">Amount</th>
+                <th className="py-2 px-4 border-b">Payment Status</th>
+                <th className="py-2 px-4 border-b">Payment Method</th>
+                <th className="py-2 px-4 border-b">Billing Status</th>
+                <th className="py-2 px-4 border-b">Created By</th>
+                <th className="py-2 px-4 border-b rounded-tr-lg">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {billings.map(billing => (
+                <tr key={billing.billID} className="hover:bg-gray-50">
+                  <td className="py-2 px-4 border-b">{billing.billID}</td>
+                  <td className="py-2 px-4 border-b">{billing.patientID}</td>
+                  <td className="py-2 px-4 border-b">{billing.amount}</td>
+                  <td className="py-2 px-4 border-b">{billing.paymentStatus}</td>
+                  <td className="py-2 px-4 border-b">{billing.paymentMethod}</td>
+                  <td className="py-2 px-4 border-b">{billing.billingStatus}</td>
+                  <td className="py-2 px-4 border-b">{billing.createdBy}</td>
+                  <td className="py-2 px-4 border-b flex space-x-2">
                     <button
-                      onClick={() => handleViewBill(bill)}
-                      className="mt-2 flex items-center text-sm font-medium text-primary-600 hover:text-primary-500 sm:mt-0"
+                      className="text-blue-600 hover:text-blue-900"
+                      onClick={() => handleEdit(billing)}
                     >
-                      View Details
+                      <Edit size={24} />
                     </button>
-                  </div>
-                  <div className="mt-2">
-                    <p className="text-sm text-gray-500">
-                      <span className="font-medium text-gray-600">Amount:</span>{' '}
-                      ${bill.totalAmount.toFixed(2)}
-                    </p>
-                  </div>
+                    <button
+                      className="text-red-600 hover:text-red-900"
+                      onClick={() => handleDelete(billing.billID)}
+                    >
+                      <Trash2 size={24} />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {billings.map(billing => (
+            <div key={billing.billID} className="bg-white p-4 rounded-lg shadow-md">
+              <div className="flex justify-between items-center mb-2">
+                <h2 className="text-xl font-bold">Bill ID: {billing.billID}</h2>
+                <div className="flex space-x-2">
+                  <button
+                    className="text-blue-600 hover:text-blue-900"
+                    onClick={() => handleEdit(billing)}
+                  >
+                    <Edit size={24} />
+                  </button>
+                  <button
+                    className="text-red-600 hover:text-red-900"
+                    onClick={() => handleDelete(billing.billID)}
+                  >
+                    <Trash2 size={24} />
+                  </button>
                 </div>
-              );
-            })}
-          </div>
-        ) : (
-          <div className="px-4 py-8 text-center text-gray-500">
-            <CreditCard className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No bills found</h3>
-            <p className="mt-1 text-sm text-gray-500">
-              {searchTerm ? 'Try adjusting your search terms.' : 'No billing information available.'}
-            </p>
-          </div>
-        )}
-      </div>
-      
-      {/* Bill Details Modal */}
-      {selectedBill && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full mx-4">
-            <div className="px-4 py-5 sm:px-6 border-b border-gray-200 flex justify-between items-center">
-              <h3 className="text-lg leading-6 font-medium text-gray-900">
-                Bill Details
-              </h3>
-              <button
-                onClick={closeModal}
-                className="text-gray-400 hover:text-gray-500"
-              >
-                <span className="sr-only">Close</span>
-                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+              </div>
+              <p><strong>Patient ID:</strong> {billing.patientID}</p>
+              <p><strong>Amount:</strong> {billing.amount}</p>
+              <p><strong>Payment Status:</strong> {billing.paymentStatus}</p>
+              <p><strong>Payment Method:</strong> {billing.paymentMethod}</p>
+              <p><strong>Billing Status:</strong> {billing.billingStatus}</p>
+              <p><strong>Created By:</strong> {billing.createdBy}</p>
             </div>
-            <div className="px-4 py-5 sm:p-6">
-              <div className="flex justify-between items-start">
+          ))}
+        </div>
+      )}
+      {selectedBilling && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-3/4 max-w-4xl relative">
+            <button
+              className="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
+              onClick={closeModal}
+            >
+              &times;
+            </button>
+            <h2 className="text-2xl font-bold mb-4">Edit Billing</h2>
+            {errors.length > 0 && (
+              <div className="bg-red-100 text-red-700 p-4 rounded-lg mt-4">
+                {errors.map((error, index) => (
+                  <p key={index}>{error}</p>
+                ))}
+              </div>
+            )}
+            <form onSubmit={handleUpdateSubmit}>
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <h4 className="text-lg font-bold text-gray-900">Invoice #{selectedBill.id.substring(0, 8)}</h4>
-                  <p className="text-sm text-gray-500">
-                    <span className="font-medium">Date:</span> {selectedBill.date}
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    <span className="font-medium">Due Date:</span> {selectedBill.dueDate}
-                  </p>
+                  <label className="block text-sm font-medium text-gray-700">Patient ID</label>
+                  <input
+                    type="number"
+                    name="patientID"
+                    onChange={handleUpdateChange}
+                    defaultValue={selectedBilling.patientID}
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50"
+                  />
                 </div>
                 <div>
-                  <p className={`px-2 inline-flex text-sm leading-5 font-semibold rounded-full ${
-                    selectedBill.status === 'paid' ? 'bg-green-100 text-green-800' : 
-                    selectedBill.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
-                    'bg-red-100 text-red-800'
-                  }`}>
-                    {selectedBill.status.charAt(0).toUpperCase() + selectedBill.status.slice(1)}
-                  </p>
+                  <label className="block text-sm font-medium text-gray-700">Amount</label>
+                  <input
+                    type="number"
+                    name="amount"
+                    onChange={handleUpdateChange}
+                    defaultValue={selectedBilling.amount}
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Payment status</label>
+                  <input
+                    type="text"
+                    name="paymentStatus"
+                    onChange={handleUpdateChange}
+                    defaultValue={selectedBilling.paymentStatus}
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Payment method</label>
+                  <input
+                    type="text"
+                    name="paymentMethod"
+                    onChange={handleUpdateChange}
+                    defaultValue={selectedBilling.paymentMethod}
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Billing Status</label>
+                  <input
+                    type="text"
+                    name="billingStatus"
+                    onChange={handleUpdateChange}
+                    defaultValue={selectedBilling.billingStatus}
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Created by</label>
+                  <input
+                    type="number"
+                    name="createdBy"
+                    onChange={handleUpdateChange}
+                    defaultValue={selectedBilling.createdBy}
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50"
+                  />
                 </div>
               </div>
-              
-              <div className="mt-6">
-                <h5 className="text-sm font-medium text-gray-500">Patient Information</h5>
-                <p className="mt-1 text-sm text-gray-900">
-                  {mockPatients.find(p => p.id === selectedBill.patientId)?.name}
-                </p>
-              </div>
-              
-              <div className="mt-6">
-                <h5 className="text-sm font-medium text-gray-500">Bill Items</h5>
-                <div className="mt-2 flex flex-col">
-                  <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                    <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-                      <div className="overflow-hidden border-b border-gray-200 sm:rounded-lg">
-                        <table className="min-w-full divide-y divide-gray-200">
-                          <thead className="bg-gray-50">
-                            <tr>
-                              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Description
-                              </th>
-                              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Quantity
-                              </th>
-                              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Unit Price
-                              </th>
-                              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Amount
-                              </th>
-                            </tr>
-                          </thead>
-                          <tbody className="bg-white divide-y divide-gray-200">
-                            {selectedBill.items.map((item, index) => (
-                              <tr key={index}>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                  {item.description}
-                                </td>
-                                <td className="px-6  py-4 whitespace-nowrap text-sm text-gray-500">
-                                  {item.quantity}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                  ${item.unitPrice.toFixed(2)}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                  ${item.amount.toFixed(2)}
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                          <tfoot>
-                            <tr>
-                              <td colSpan={3} className="px-6 py-4 text-sm font-medium text-gray-900 text-right">
-                                Total
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                ${selectedBill.totalAmount.toFixed(2)}
-                              </td>
-                            </tr>
-                          </tfoot>
-                        </table>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              {selectedBill.status === 'paid' && (
-                <div className="mt-6 bg-green-50 p-4 rounded-md">
-                  <div className="flex">
-                    <div className="flex-shrink-0">
-                      <CheckCircle className="h-5 w-5 text-green-400" />
-                    </div>
-                    <div className="ml-3">
-                      <h3 className="text-sm font-medium text-green-800">Payment Received</h3>
-                      <div className="mt-2 text-sm text-green-700">
-                        <p>Payment was received on {selectedBill.paymentDate} via {selectedBill.paymentMethod}.</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-            <div className="px-4 py-4 sm:px-6 bg-gray-50 flex justify-end space-x-3 rounded-b-lg">
-              <button
-                type="button"
-                className="btn btn-outline flex items-center"
-              >
-                <Download className="h-4 w-4 mr-2" />
-                Download Invoice
-              </button>
-              {user?.role === 'patient' && selectedBill.status !== 'paid' && (
+              <div className="mt-4 flex justify-end space-x-2">
                 <button
                   type="button"
-                  className="btn btn-primary"
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+                  onClick={closeModal}
                 >
-                  Pay Now
+                  Cancel
                 </button>
-              )}
-              <button
-                type="button"
-                onClick={closeModal}
-                className="btn btn-outline"
-              >
-                Close
-              </button>
-            </div>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                >
+                  Submit
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      {isAddModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-3/4 max-w-4xl relative">
+            <button
+              className="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
+              onClick={closeModal}
+            >
+              &times;
+            </button>
+            <h2 className="text-2xl font-bold mb-4">Add Billing</h2>
+            {errors.length > 0 && (
+              <div className="bg-red-100 text-red-700 p-4 rounded-lg mt-4">
+                {errors.map((error, index) => (
+                  <p key={index}>{error}</p>
+                ))}
+              </div>
+            )}
+            <form onSubmit={handleRegisterSubmit}>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Patient ID</label>
+                  <input
+                    type="number"
+                    name="patientID"
+                    onChange={handleRegisterChange}
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Amount</label>
+                  <input
+                    type="number"
+                    name="amount"
+                    onChange={handleRegisterChange}
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">payment_status</label>
+                  <input
+                    type="text"
+                    name="paymentStatus"
+                    onChange={handleRegisterChange}
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Payment method</label>
+                  <input
+                    type="text"
+                    name="paymentMethod"
+                    onChange={handleRegisterChange}
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Billing status</label>
+                  <input
+                    type="text"
+                    name="billingStatus"
+                    onChange={handleRegisterChange}
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Created by</label>
+                  <input
+                    type="number"
+                    name="createdBy"
+                    onChange={handleRegisterChange}
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50"
+                  />
+                </div>
+              </div>
+              <div className="mt-4 flex justify-end space-x-2">
+                <button
+                  type="button"
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+                  onClick={closeModal}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                >
+                  Submit
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
@@ -280,4 +394,4 @@ const BillingList: React.FC = () => {
   );
 };
 
-export default BillingList;
+export default ViewAllBilling;

@@ -58,6 +58,21 @@ const AppointmentCalendar: React.FC = () => {
     };
   });
   
+  // Add background event for busy hours
+  const busyHours = [];
+  for (let i = 0; i < 7; i++) {
+    busyHours.push({
+      id: `busyHours-${i}`,
+      title: 'Busy',
+      start: `2025-03-1${i}T09:00:00`,
+      end: `2025-03-1${i}T17:00:00`,
+      display: 'background',
+      backgroundColor: "blue", // light gray
+      borderColor: '#d1d5db'
+    });
+  }
+  events.push(...busyHours);
+  
   const handleEventClick = (info: any) => {
     setSelectedAppointment(info.event.extendedProps.appointment);
   };
@@ -167,7 +182,7 @@ const AppointmentCalendar: React.FC = () => {
                   Complete Appointment
                 </button>
               )}
-              {user?.role === 'patient' && selectedAppointment. status === 'scheduled' && (
+              {user?.role === 'patient' && selectedAppointment.status === 'scheduled' && (
                 <button
                   type="button"
                   className="btn btn-outline text-red-600 hover:bg-red-50"

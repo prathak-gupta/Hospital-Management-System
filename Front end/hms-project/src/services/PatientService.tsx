@@ -40,6 +40,7 @@ class PatientService {
   searchPatient(keyword: string): Promise<AxiosResponse<Patient[]>> {
     return axios.get(`${API_URL}/search?keyword=${keyword}`);
   }
+
 }
  
 export default new PatientService();

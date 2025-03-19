@@ -1,11 +1,37 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User } from '../types';
-import { mockUsers } from '../data/mockData';
+import DoctorLogin from '../services/Login/DoctorLogin';
+import PatientLogin from '../services/Login/PatientLogin';
+import AdminLogin from '../services/Login/AdminLogin';
+import DoctorService from '../services/DoctorService';
+import PatientService from '../services/PatientService';
+import AdminService from '../services/AdminService';
+
+const doctorCred = {
+  loginId: 0,
+  doctorId: 0,
+  username: '',
+  password: ''
+};
+
+const adminCred = {
+  loginId: 0,
+  adminId: 0,
+  username: '',
+  password: ''
+};
+
+const patientCred = {
+  loginId: 0,
+  patientId: 0,
+  username: '',
+  password: ''
+};
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
+  login: (domain: string, email: string, password: string) => Promise<boolean>;
   logout: () => void;
   isAuthenticated: boolean;
 }
@@ -17,7 +43,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is stored in localStorage
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       setUser(JSON.parse(storedUser));
@@ -25,24 +50,96 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLoading(false);
   }, []);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
-    // In a real app, this would be an API call
-    // For demo purposes, we're using mock data
+  const login = async (domain: string, username: string, password: string): Promise<boolean> => {
     setLoading(true);
+
     
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Find user with matching email
-    const foundUser = mockUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
-    
-    if (foundUser && password === 'password') { // Simple password check for demo
-      setUser(foundUser);
-      localStorage.setItem('user', JSON.stringify(foundUser));
-      setLoading(false);
-      return true;
+    //here we also have to apply if else ladder for admin, staff, patient..
+    if (domain === 'doctor') {
+      doctorCred.username = username;
+      doctorCred.password = password;
+      try {
+        const res = (await DoctorLogin.authenticateDoctor(doctorCred)).data;
+        if (res > 0) {
+          const doc = (await DoctorService.getDoctorById(res)).data;
+          const foundUser: User = {
+            id: doc.doctorID,
+            email: doc.email || '', // Ensure email is a string
+            name: `Dr. ${doc.firstName} ${doc.lastName}`,
+            role: 'doctor',
+            avatar: 'https://cdn4.iconfinder.com/data/icons/professions-1-2/151/3-1024.png'
+          };
+          setUser(foundUser);
+          localStorage.setItem('user', JSON.stringify(foundUser));
+          console.log('Login Successful.');
+          setLoading(false);
+          return true;
+        } else {
+          console.log('Login Failed.');
+        }
+      } catch (error) {
+        console.error('Error during login:', error);
+      }
     }
-    
+    // For testing purpose.. need to update with proper login functionality..
+    else if (domain === 'admin') {
+      adminCred.username = username;
+      adminCred.password = password;
+      try {
+        const res = (await AdminLogin.authenticateAdmin(adminCred)).data;
+        if (res > 0) {
+          const admin = (await AdminService.getAdminById(res)).data;
+          const foundUser: User = {
+            id: admin.adminID,
+            email: admin.email || '', // Ensure email is a string
+            name: `${admin.username}`,
+            role: 'admin',
+            avatar: 'https://cdn4.iconfinder.com/data/icons/professions-1-2/151/3-1024.png'
+          };
+          setUser(foundUser);
+          localStorage.setItem('user', JSON.stringify(foundUser));
+          console.log('Login Successful.');
+          setLoading(false);
+          return true;
+        } else {
+          console.log('Login Failed.');
+        }
+      } catch (error) {
+        console.error('Error during login:', error);
+      }
+}
+
+    // For testing purpose.. need to update with proper login functionality..
+    else if (domain === 'patient') {
+      patientCred.username = username;
+      patientCred.password = password;
+      try {
+        const res = (await PatientLogin.authenticatePatient(patientCred)).data;
+        if (res > 0) {
+          const pat = (await PatientService.getPatientById(res)).data;
+          const foundUser: User = {
+            id: pat.patientID,
+            email: pat.email || '', // Ensure email is a string
+            name: `${pat.firstName} ${pat.lastName}`,
+            role: 'patient',
+            avatar: 'https://cdn4.iconfinder.com/data/icons/professions-1-2/151/3-1024.png'
+          };
+          console.log(pat);
+          setUser(foundUser);
+          localStorage.setItem('user', JSON.stringify(foundUser));
+          console.log('Login Successful.');
+          setLoading(false);
+          return true;
+        } else {
+          console.log('Login Failed.');
+        }
+      } catch (error) {
+        console.error('Error during login:', error);
+      }
+ 
+}
+
+    console.log("No login function ran..")
     setLoading(false);
     return false;
   };
@@ -53,13 +150,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      loading, 
-      login, 
-      logout, 
-      isAuthenticated: !!user 
-    }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, isAuthenticated: !!user }}>
       {children}
     </AuthContext.Provider>
   );

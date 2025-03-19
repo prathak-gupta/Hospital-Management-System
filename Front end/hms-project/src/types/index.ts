@@ -1,7 +1,7 @@
 export type UserRole = 'admin' | 'doctor' | 'patient';
 
 export interface User {
-  id: string;
+  id: number;
   name: string;
   email: string;
   role: UserRole;
@@ -31,9 +31,9 @@ export interface Admin extends User {
 }
 
 export interface Appointment {
-  id: string;
-  patientId: string;
-  doctorId: string;
+  id: number;
+  patientId: number;
+  doctorId: number;
   date: string;
   startTime: string;
   endTime: string;
@@ -43,9 +43,9 @@ export interface Appointment {
 }
 
 export interface MedicalRecord {
-  id: string;
-  patientId: string;
-  doctorId: string;
+  id: number;
+  patientId: number;
+  doctorId: number;
   date: string;
   diagnosis: string;
   treatment: string;
@@ -54,9 +54,9 @@ export interface MedicalRecord {
 }
 
 export interface Prescription {
-  id: string;
-  patientId: string;
-  doctorId: string;
+  id: number;
+  patientId: number;
+  doctorId: number;
   date: string;
   medications: Medication[];
   instructions: string;
@@ -73,9 +73,9 @@ export interface Medication {
 }
 
 export interface Bill {
-  id: string;
-  patientId: string;
-  date: string;
+  id: number;
+  patientId: number;
+  date: number;
   dueDate: string;
   items: BillItem[];
   totalAmount: number;
@@ -92,9 +92,9 @@ export interface BillItem {
 }
 
 export interface LabReport {
-  id: string;
-  patientId: string;
-  doctorId: string;
+  id: number;
+  patientId: number;
+  doctorId: number;
   date: string;
   testType: string;
   results: string;

@@ -15,6 +15,9 @@ import VitalsMonitor from './components/Vitals/VitalsMonitor';
 import ViewAllDoctors from './components/ViewAll/ViewAllDoctors';
 import ViewAllStaff from './components/ViewAll/VieAllStaff';
 import ViewAllPatients from './components/ViewAll/ViewAllPatients';
+import MyPatietns from './components/Doctor/MyPatients';
+import  Settings from './components/Settings/Settings';
+import PatientBilling from './PatientBilling/PatientBilling';
 
 // Protected route component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -51,13 +54,17 @@ function App() {
             
             <Route path="medical-records" element={<PatientRecords />} />
             <Route path="prescriptions" element={<PrescriptionList />} />
-            <Route path="billing" element={<BillingList />} />
+            <Route path="billing" element={<PatientBilling />} />
             <Route path="lab-reports" element={<LabReportList />} />
             <Route path="notifications" element={<NotificationList />} />
             <Route path="vitals" element={<VitalsMonitor />} />
             <Route path="/alldoctors" element={<ViewAllDoctors/>} />
             <Route path="/allpatients" element={<ViewAllPatients/>} />
             <Route path="/allstaff" element={<ViewAllStaff/>} />
+            <Route path="/my-patients" element={<MyPatietns/>} />
+            <Route path="/settings" element={<Settings/>} />
+            <Route path="/patients" element={<ViewAllPatients/>} />
+            <Route path="/doctors" element={<ViewAllDoctors/>} />
             
             {/* Add more routes as needed */}
             <Route path="*" element={<div>Page not found</div>} />

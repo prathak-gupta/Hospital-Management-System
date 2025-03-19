@@ -2,9 +2,18 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Activity, Mail, Lock, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import DoctorLogin from "../../services/Login/DoctorLogin"
+
+interface DoctorCreds{
+  loginId: number;
+  doctorId: number;
+  username: string;
+  password: string;
+}
 
 const LoginForm: React.FC = () => {
   const [email, setEmail] = useState('');
+  const [domain, setDomain] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -15,9 +24,16 @@ const LoginForm: React.FC = () => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
+      
+    const docred =   {
+      "loginId": 0,
+      "doctorId": 0,
+      "username": "patty@14",
+      "password": "password"
+  }
 
     try {
-      const success = await login(email, password);
+      const success = await login(domain,email, password);
       if (success) {
         navigate('/dashboard');
       } else {
@@ -142,25 +158,32 @@ const LoginForm: React.FC = () => {
             <div className="mt-2 grid grid-cols-3 gap-2">
               <button
                 type="button"
-                onClick={() => setEmail('admin@hospital.com')}
+                onClick={() => { setDomain("admin");  console.log("Admin Selected..");}}
                 className="py-2 px-4 border border-gray-300 rounded-md shadow-sm text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
               >
                 Admin
               </button>
               <button
                 type="button"
-                onClick={() => setEmail('sarah.johnson@hospital.com')}
+                onClick={() => { setDomain("doctor"); console.log("Doctor Selected..");}}
                 className="py-2 px-4 border border-gray-300 rounded-md shadow-sm text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
               >
                 Doctor
               </button>
               <button
                 type="button"
-                onClick={() => setEmail('john.smith@example.com')}
+                onClick={() => { setDomain("patient"); console.log("Patient Selected..");}}
                 className="py-2 px-4 border border-gray-300 rounded-md shadow-sm text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
               >
                 Patient
               </button>
+              {/* <button
+                type="button"
+                onClick={() => {setEmail('staff@example.com'); setDomain("staff"); console.log("Staff Selected..");}}
+                className="py-2 px-4 border border-gray-300 rounded-md shadow-sm text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+              >
+                Staff
+              </button> */}
             </div>
           </div>
         </form>

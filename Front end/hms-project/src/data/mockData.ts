@@ -8,35 +8,35 @@ const formatDate = (date: Date) => format(date, 'yyyy-MM-dd');
 // Mock Users
 export const mockUsers: User[] = [
   {
-    id: 'admin1',
+    id: 1,
     name: 'Admin User',
     email: 'admin@hospital.com',
     role: 'admin',
     avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
   },
   {
-    id: 'doctor1',
+    id: 2,
     name: 'Dr. Sarah Johnson',
     email: 'sarah.johnson@hospital.com',
     role: 'doctor',
-    avatar: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+    avatar: 'https://cdn4.iconfinder.com/data/icons/professions-1-2/151/3-1024.png',
   },
   {
-    id: 'doctor2',
+    id: 3,
     name: 'Dr. Michael Chen',
     email: 'michael.chen@hospital.com',
     role: 'doctor',
     avatar: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
   },
   {
-    id: 'patient1',
+    id: 4,
     name: 'John Smith',
     email: 'john.smith@example.com',
     role: 'patient',
     avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
   },
   {
-    id: 'patient2',
+    id: 5,
     name: 'Emily Davis',
     email: 'emily.davis@example.com',
     role: 'patient',
@@ -47,7 +47,7 @@ export const mockUsers: User[] = [
 // Mock Doctors
 export const mockDoctors: Doctor[] = [
   {
-    id: 'doctor1',
+    id: 6,
     name: 'Dr. Sarah Johnson',
     email: 'sarah.johnson@hospital.com',
     role: 'doctor',
@@ -62,7 +62,7 @@ export const mockDoctors: Doctor[] = [
     avatar: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
   },
   {
-    id: 'doctor2',
+    id: 7,
     name: 'Dr. Michael Chen',
     email: 'michael.chen@hospital.com',
     role: 'doctor',
@@ -81,7 +81,7 @@ export const mockDoctors: Doctor[] = [
 // Mock Patients
 export const mockPatients: Patient[] = [
   {
-    id: 'patient1',
+    id: 8,
     name: 'John Smith',
     email: 'john.smith@example.com',
     role: 'patient',
@@ -93,7 +93,7 @@ export const mockPatients: Patient[] = [
     avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
   },
   {
-    id: 'patient2',
+    id: 9,
     name: 'Emily Davis',
     email: 'emily.davis@example.com',
     role: 'patient',
@@ -109,7 +109,7 @@ export const mockPatients: Patient[] = [
 // Mock Admins
 export const mockAdmins: Admin[] = [
   {
-    id: 'admin1',
+    id: 10,
     name: 'Admin User',
     email: 'admin@hospital.com',
     role: 'admin',
@@ -158,9 +158,9 @@ export const mockAppointments: Appointment[] = [
 // Mock Medical Records
 export const mockMedicalRecords: MedicalRecord[] = [
   {
-    id: 'record1',
-    patientId: 'patient1',
-    doctorId: 'doctor1',
+    id: 1,
+    patientId: 1,
+    doctorId: 1,
     date: formatDate(subDays(today, 30)),
     diagnosis: 'Hypertension',
     treatment: 'Prescribed Lisinopril 10mg daily',
@@ -168,9 +168,9 @@ export const mockMedicalRecords: MedicalRecord[] = [
     attachments: ['report1.pdf'],
   },
   {
-    id: 'record2',
-    patientId: 'patient2',
-    doctorId: 'doctor1',
+    id: 2,
+    patientId: 2,
+    doctorId: 1,
     date: formatDate(subDays(today, 15)),
     diagnosis: 'Migraine',
     treatment: 'Prescribed Sumatriptan as needed',
