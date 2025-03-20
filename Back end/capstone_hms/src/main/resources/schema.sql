@@ -28,6 +28,21 @@ CREATE TABLE if not exists Doctors (
     Registration_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Prescription Table
+CREATE TABLE IF NOT EXISTS prescriptions (
+    prescriptionId INT AUTO_INCREMENT PRIMARY KEY,
+    PatientID INT NOT NULL,
+    DoctorID INT NOT NULL,
+    medication_name VARCHAR(255) NOT NULL,
+    dosage VARCHAR(50) NOT NULL,
+    frequency VARCHAR(50) NOT NULL,
+    duration VARCHAR(50) NOT NULL,
+    issue_date DATE NOT NULL,
+    notes TEXT,
+    FOREIGN KEY (PatientID) REFERENCES patients(PatientID),
+    FOREIGN KEY (DoctorID) REFERENCES doctors(DoctorID)
+);
+
 -- Staff Table
 CREATE TABLE if not exists Staff (
     StaffID INT AUTO_INCREMENT PRIMARY KEY,
