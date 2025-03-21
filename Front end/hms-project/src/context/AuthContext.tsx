@@ -64,6 +64,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const doc = (await DoctorService.getDoctorById(res)).data;
           const foundUser: User = {
             id: doc.doctorID,
+            username: username,
             email: doc.email || '', // Ensure email is a string
             name: `Dr. ${doc.firstName} ${doc.lastName}`,
             role: 'doctor',
@@ -91,6 +92,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const admin = (await AdminService.getAdminById(res)).data;
           const foundUser: User = {
             id: admin.adminID,
+            username: username,
             email: admin.email || '', // Ensure email is a string
             name: `${admin.username}`,
             role: 'admin',
@@ -119,6 +121,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const pat = (await PatientService.getPatientById(res)).data;
           const foundUser: User = {
             id: pat.patientID,
+            username: username,
             email: pat.email || '', // Ensure email is a string
             name: `${pat.firstName} ${pat.lastName}`,
             role: 'patient',

@@ -1,6 +1,5 @@
 package com.genpact.capstone_hms.controller;
 
-import com.genpact.capstone_hms.model.AdminLogin;
 import com.genpact.capstone_hms.model.DoctorLogin;
 import com.genpact.capstone_hms.service.DoctorLoginService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,7 +69,29 @@ public class DoctorLoginController {
     
     @PostMapping("/auth")
     @ResponseBody
-    public int AuthenticateAdminLogin(@RequestBody DoctorLogin docLogin) {
+    public int authenticateDoctorLogin(@RequestBody DoctorLogin docLogin) {
         return doctorLoginService.authenticateDoctorLogin(docLogin);
+    }
+
+    @PostMapping("/reset-password")
+    @ResponseBody
+    public ResponseEntity<String> resetPassword(@RequestParam String username, @RequestParam String oldPassword, @RequestParam String newPassword, @RequestParam String email) {
+        boolean result = doctorLoginService.resetPassword(username, oldPassword, newPassword, email);
+        if (result) {
+            return ResponseEntity.ok("Password reset successfully");
+        } else {
+            return ResponseEntity.badRequest().body("Failed to reset password. Please check your old password.");
+        }
+    }
+
+    @PostMapping("/forgot-password")
+    @ResponseBody
+    public ResponseEntity<String> forgotPassword(@RequestParam String username) {
+        boolean result = doctorLoginService.forgotPassword(username);
+        if (result) {
+            return ResponseEntity.ok("Temporary password sent successfully");
+        } else {
+            return ResponseEntity.badRequest().body("Failed to set temporary password");
+        }
     }
 }

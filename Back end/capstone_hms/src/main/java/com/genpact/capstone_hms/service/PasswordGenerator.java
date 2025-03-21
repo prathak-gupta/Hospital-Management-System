@@ -7,7 +7,7 @@ public class PasswordGenerator {
     private static final String LOWERCASE = "abcdefghijklmnopqrstuvwxyz";
     private static final String UPPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private static final String DIGITS = "0123456789";
-    private static final String SYMBOLS = "@#$%&";
+    private static final String SYMBOLS = "@";
     private static final String ALL_CHARACTERS = LOWERCASE + UPPERCASE + DIGITS + SYMBOLS;
     private static final int PASSWORD_LENGTH = 12;
     private static final SecureRandom RANDOM = new SecureRandom();

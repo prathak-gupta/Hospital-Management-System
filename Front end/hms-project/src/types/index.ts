@@ -2,6 +2,7 @@ export type UserRole = 'admin' | 'doctor' | 'patient';
 
 export interface User {
   id: number;
+  username: string,
   name: string;
   email: string;
   role: UserRole;

@@ -10,7 +10,7 @@ const Sidebar: React.FC = () => {
   const getNavItems = () => {
     const commonItems = [
       { name: 'Dashboard', path: '/dashboard', icon: <Home size={20} /> },
-      { name: 'Schedule', path: '/appointments', icon: <Calendar size={20} /> },
+      // { name: 'Schedule', path: '/appointments', icon: <Calendar size={20} /> },
       // { name: 'Notifications', path: '/notifications', icon: <Bell size={20} /> },
       { name: 'Settings', path: '/settings', icon: <Settings size={20} /> },
     ];
@@ -19,7 +19,8 @@ const Sidebar: React.FC = () => {
       return [
         ...commonItems,
         { name: 'Doctors', path: '/doctors', icon: <Users size={20} /> },
-        { name: 'Patients', path: '/patients', icon: <UserCircle size={20} /> },
+      { name: 'Schedule', path: '/appointments', icon: <Calendar size={20} /> },
+      { name: 'Patients', path: '/patients', icon: <UserCircle size={20} /> },
         { name: 'Billing', path: '/billing', icon: <CreditCard size={20} /> },
         // { name: 'Reports', path: '/reports', icon: <FileText size={20} /> },
         // { name: 'Prescription', path: '/prescriptions', icon: <FileText size={20} /> },
@@ -30,6 +31,7 @@ const Sidebar: React.FC = () => {
       return [
         ...commonItems,
         { name: 'My Patients', path: '/my-patients', icon: <UserCircle size={20} /> },
+        { name: 'Schedule', path: '/appointments', icon: <Calendar size={20} /> },
         // { name: 'Medical Records', path: '/medical-records', icon: <ClipboardList size={20} /> },
         { name: 'Prescriptions', path: '/prescriptions', icon: <Pill size={20} /> },
         // { name: 'Lab Reports', path: '/lab-reports', icon: <Flask size={20} /> },

@@ -70,8 +70,29 @@ public class AdminLoginController {
     
     @PostMapping("/auth")
     @ResponseBody
-    public int AuthenticateAdminLogin(@RequestBody AdminLogin adminLogin) {
+    public int authenticateAdminLogin(@RequestBody AdminLogin adminLogin) {
         return adminLoginService.authenticateAdminLogin(adminLogin);
     }
 
+    @PostMapping("/reset-password")
+    @ResponseBody
+    public ResponseEntity<String> resetPassword(@RequestParam String username, @RequestParam String oldPassword, @RequestParam String newPassword, @RequestParam String email) {
+        boolean result = adminLoginService.resetPassword(username, oldPassword, newPassword, email);
+        if (result) {
+            return ResponseEntity.ok("Password reset successfully");
+        } else {
+            return ResponseEntity.badRequest().body("Failed to reset password. Please check your old password.");
+        }
+    }
+
+    @PostMapping("/forgot-password")
+    @ResponseBody
+    public ResponseEntity<String> forgotPassword(@RequestParam String username) {
+        boolean result = adminLoginService.forgotPassword(username);
+        if (result) {
+            return ResponseEntity.ok("Temporary password sent successfully");
+        } else {
+            return ResponseEntity.badRequest().body("Failed to set temporary password");
+        }
+    }
 }

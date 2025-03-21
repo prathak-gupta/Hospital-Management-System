@@ -1,15 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Activity, Mail, Lock, AlertCircle } from 'lucide-react';
+import { Activity, Mail, Lock, AlertCircle, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import DoctorLogin from "../../services/Login/DoctorLogin"
-
-interface DoctorCreds{
-  loginId: number;
-  doctorId: number;
-  username: string;
-  password: string;
-}
+import DoctorLogin from '../../services/Login/DoctorLogin';
+import PatientLogin from '../../services/Login/PatientLogin';
+import AdminLogin from '../../services/Login/AdminLogin';
 
 const LoginForm: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -17,6 +12,8 @@ const LoginForm: React.FC = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [showModal, setShowModal] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -24,16 +21,15 @@ const LoginForm: React.FC = () => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
-      
-    const docred =   {
-      "loginId": 0,
-      "doctorId": 0,
-      "username": "patty@14",
-      "password": "password"
-  }
+
+    if (!domain) {
+      setNotification({ message: 'Please select a domain', type: 'error' });
+      setIsLoading(false);
+      return;
+    }
 
     try {
-      const success = await login(domain,email, password);
+      const success = await login(domain, email, password);
       if (success) {
         navigate('/dashboard');
       } else {
@@ -46,6 +42,76 @@ const LoginForm: React.FC = () => {
       setIsLoading(false);
     }
   };
+
+  const handleForgotPassword = async () => {
+    if (!domain) {
+      setNotification({ message: 'Please select a domain', type: 'error' });
+      return;
+    }
+    if (!email) {
+      setNotification({ message: 'Please enter your email address', type: 'error' });
+      return;
+    }
+    setShowModal(true);
+  };
+
+  const confirmForgotPassword = async () => {
+    setShowModal(false);
+    let apiUrl = '';
+    if (domain === 'admin') {
+      AdminLogin.forgotPassword(email).then(response =>{
+        setNotification({ message: 'Forgot password request sent successfully', type: 'success' });
+}).catch(error =>{
+        setNotification({ message: 'Error sending forgot password request', type: 'error' });
+
+});
+
+} else if (domain === 'doctor') {
+      DoctorLogin.forgotPassword(email).then(response =>{
+              setNotification({ message: 'Forgot password request sent successfully', type: 'success' });
+      }).catch(error =>{
+              setNotification({ message: 'Error sending forgot password request', type: 'error' });
+
+      });
+
+    } else if (domain === 'patient') {
+      PatientLogin.forgotPassword(email).then(response =>{
+        setNotification({ message: 'Forgot password request sent successfully', type: 'success' });
+}).catch(error =>{
+        setNotification({ message: 'Error sending forgot password request', type: 'error' });
+
+});
+}
+
+    // try {
+    //   const response = await fetch(apiUrl, {
+    //     method: 'POST',
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //     },
+    //     body: JSON.stringify({ email }),
+    //   });
+
+    //   if (!response.ok) {
+    //     throw new Error('Failed to send forgot password request');
+    //   }
+
+    //   setNotification({ message: 'Forgot password request sent successfully', type: 'success' });
+    // } catch (error) {
+    //   console.error('Error sending forgot password request:', error);
+    //   setNotification({ message: 'Error sending forgot password request', type: 'error' });
+    // }
+  };
+
+  useEffect(() => {
+    if (notification) {
+      const timer = setTimeout(() => {
+        setNotification(null);
+      }, 3000); // Auto disappear after 3 seconds
+
+      return () => clearTimeout(timer);
+    }
+  }, [notification]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -61,7 +127,7 @@ const LoginForm: React.FC = () => {
             Hospital Management System
           </p>
         </div>
-        
+
         {error && (
           <div className="bg-red-50 border-l-4 border-red-400 p-4">
             <div className="flex">
@@ -74,7 +140,7 @@ const LoginForm: React.FC = () => {
             </div>
           </div>
         )}
-        
+
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
@@ -127,6 +193,7 @@ const LoginForm: React.FC = () => {
                 id="remember-me"
                 name="remember-me"
                 type="checkbox"
+                defaultChecked
                 className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
               />
               <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
@@ -135,9 +202,13 @@ const LoginForm: React.FC = () => {
             </div>
 
             <div className="text-sm">
-              <a href="#" className="font-medium text-primary-600 hover:text-primary-500">
+              <button
+                type="button"
+                onClick={handleForgotPassword}
+                className="font-medium text-primary-600 hover:text-primary-500"
+              >
                 Forgot your password?
-              </a>
+              </button>
             </div>
           </div>
 
@@ -150,43 +221,75 @@ const LoginForm: React.FC = () => {
               {isLoading ? 'Signing in...' : 'Sign in'}
             </button>
           </div>
-          
+
           <div className="mt-4">
             <p className="text-center text-sm text-gray-600">
-              Demo accounts (use password: "password"):
+              Current selected domain: {domain || "None"}
             </p>
             <div className="mt-2 grid grid-cols-3 gap-2">
               <button
                 type="button"
-                onClick={() => { setDomain("admin");  console.log("Admin Selected..");}}
-                className="py-2 px-4 border border-gray-300 rounded-md shadow-sm text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                onClick={() => { setDomain("admin"); setNotification({ message: "Admin Selected", type: "success" }); }}
+                className={`py-2 px-4 border border-gray-300 rounded-md shadow-sm text-xs font-medium ${domain === "admin" ? "bg-primary-100" : "bg-white"} hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500`}
               >
                 Admin
               </button>
               <button
                 type="button"
-                onClick={() => { setDomain("doctor"); console.log("Doctor Selected..");}}
-                className="py-2 px-4 border border-gray-300 rounded-md shadow-sm text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                onClick={() => { setDomain("doctor"); setNotification({ message: "Doctor Selected", type: "success" }); }}
+                className={`py-2 px-4 border border-gray-300 rounded-md shadow-sm text-xs font-medium ${domain === "doctor" ? "bg-primary-100" : "bg-white"} hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500`}
               >
                 Doctor
               </button>
               <button
                 type="button"
-                onClick={() => { setDomain("patient"); console.log("Patient Selected..");}}
-                className="py-2 px-4 border border-gray-300 rounded-md shadow-sm text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                onClick={() => { setDomain("patient"); setNotification({ message: "Patient Selected", type: "success" }); }}
+                className={`py-2 px-4 border border-gray-300 rounded-md shadow-sm text-xs font-medium ${domain === "patient" ? "bg-primary-100" : "bg-white"} hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500`}
               >
                 Patient
               </button>
-              {/* <button
-                type="button"
-                onClick={() => {setEmail('staff@example.com'); setDomain("staff"); console.log("Staff Selected..");}}
-                className="py-2 px-4 border border-gray-300 rounded-md shadow-sm text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-              >
-                Staff
-              </button> */}
             </div>
           </div>
         </form>
+
+        {notification && (
+          <div
+            className={`fixed top-[20px] right-[20px] p-[16px] rounded-md shadow-lg ${
+              notification.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+            } flex items-center`}
+          >
+            {notification.type === 'success' ? (
+              <AlertCircle className='mr-[8px]' size={24} />
+            ) : (
+              <AlertTriangle className='mr-[8px]' size={24} />
+            )}
+            {notification.message}
+          </div>
+        )}
+
+        {/* Warning Modal */}
+        {showModal && (
+          <div className="fixed inset-[0] flex items-center justify-center overflow-y-auto bg-black bg-opacity-[0.5]">
+            <div className="bg-white rounded-lg shadow-lg p-[24px] max-w-md w-full">
+              <h3 className="text-lg font-medium text-gray-[900]">Warning</h3>
+              <p className="mt-[8px] text-sm text-gray-[600]">After proceeding, your current password will be removed and a temporary password will be sent to your email. Do you want to continue?</p>
+              <div className="mt-[16px] flex justify-end">
+                <button
+                  className="mr-[8px] px-[16px] py-[8px] bg-gray-[200] rounded-md hover:bg-gray-[300]"
+                  onClick={() => setShowModal(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="px-[16px] py-[8px] bg-red-600 text-white rounded-md hover:bg-red-700"
+                  onClick={confirmForgotPassword}
+                >
+                  Proceed
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
