@@ -21,6 +21,9 @@ import PatientBilling from './PatientBilling/PatientBilling';
 import Home from "./components/LandingPage.tsx/Home";
 import Security from "./components/Security/Security"
 import FractureDetector from './components/AI/FractureDetector';
+import AdminProfile from './components/MyProfile/AdminProfile';
+import DoctorProfile from './components/MyProfile/DoctorProfile';
+import PatientProfile from './components/MyProfile/PatientProfile';
 
 // Protected route component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -73,6 +76,9 @@ function App() {
             <Route path="/ai-fracture-detector" element={<FractureDetector />} />
             <Route path="/derm-ai" element={<FractureDetector />} />
             <Route path="/ai-prescription-detector" element={<FractureDetector />} />
+            <Route path="/admin_profile" element={<AdminProfile />} />
+            <Route path="/doctor_profile" element={<DoctorProfile />} />
+            <Route path="/patient_profile" element={<PatientProfile />} />
             
             {/* Add more routes as needed */}
             <Route path="*" element={<div>Page not found</div>} />

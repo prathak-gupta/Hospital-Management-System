@@ -3,7 +3,7 @@ import axios, { AxiosResponse } from "axios";
 const API_URL = "http://localhost:5050/api/admins";
  
 interface Admin {
-adminID:number,
+adminId:number,
 username:string,
 password:string,
 role:string,

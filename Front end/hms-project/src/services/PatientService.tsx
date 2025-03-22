@@ -13,7 +13,7 @@ interface Patient {
   email?: string;
   emergencyContactName?: string;
   emergencyContactPhone?: string;
-  registration_date: string;
+  registrationDate: string;
 }
  
 class PatientService {

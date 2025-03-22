@@ -90,14 +90,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const res = (await AdminLogin.authenticateAdmin(adminCred)).data;
         if (res > 0) {
           const admin = (await AdminService.getAdminById(res)).data;
+          // console.log("Admin id:", admin.adminId)
           const foundUser: User = {
-            id: admin.adminID,
+            id: admin.adminId,
             username: username,
             email: admin.email || '', // Ensure email is a string
             name: `${admin.username}`,
             role: 'admin',
             avatar: 'https://cdn4.iconfinder.com/data/icons/professions-1-2/151/3-1024.png'
           };
+          // console.log("admin",foundUser);
           setUser(foundUser);
           localStorage.setItem('user', JSON.stringify(foundUser));
           console.log('Login Successful.');

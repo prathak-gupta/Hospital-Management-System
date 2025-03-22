@@ -13,7 +13,7 @@ interface Patient {
   email?: string;
   emergencyContactName?: string;
   emergencyContactPhone?: string;
-  registration_date: string;
+  registrationDate: string;
 }
  
 const ViewAllPatients: React.FC = () => {
@@ -43,7 +43,7 @@ const ViewAllPatients: React.FC = () => {
       "email": "",
       "emergencyContactName": "",
       "emergencyContactPhone": "",
-      "registration_date":" "  
+      "registrationDate":" "  
       });
   const handleEdit = (patient: Patient) => {
     setSelectedPatient(patient);
@@ -154,7 +154,7 @@ const ViewAllPatients: React.FC = () => {
                   <td className="py-2 px-4 border-b">{patient.email || 'N/A'}</td>
                   <td className="py-2 px-4 border-b">{patient.emergencyContactName || 'N/A'}</td>
                   <td className="py-2 px-4 border-b">{patient.emergencyContactPhone || 'N/A'}</td>
-                  <td className="py-2 px-4 border-b">{new Date(patient.registration_date).toLocaleDateString()}</td>
+                  <td className="py-2 px-4 border-b">{new Date(patient.registrationDate).toLocaleDateString()}</td>
                   <td className="py-2 px-4 border-b flex space-x-2">
                     <button
                       className="text-blue-600 hover:text-blue-900"
@@ -203,7 +203,7 @@ const ViewAllPatients: React.FC = () => {
               <p><strong>Email:</strong> {patient.email || 'N/A'}</p>
               <p><strong>Emergency Contact Name:</strong> {patient.emergencyContactName || 'N/A'}</p>
               <p><strong>Emergency Contact Phone:</strong> {patient.emergencyContactPhone || 'N/A'}</p>
-              <p><strong>Registration Date:</strong> {new Date(patient.registration_date).toLocaleDateString()}</p>
+              <p><strong>Registration Date:</strong> {new Date(patient.registrationDate).toLocaleDateString()}</p>
             </div>
           ))}
         </div>
