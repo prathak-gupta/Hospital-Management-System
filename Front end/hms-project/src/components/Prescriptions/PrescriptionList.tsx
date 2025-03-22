@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PrescriptionService from '../../services/PrescriptionService';
 import { User } from '../../types';
+import { Plus } from 'lucide-react';
 
 
 interface Prescription {
@@ -149,7 +150,7 @@ const PrescriptionList: React.FC = () => {
       </div>
       
       <div className="px-4 py-5 sm:p-6">
-       <button onClick={openModalForNewEntry} className="btn btn-primary mb-4"> New Prescription </button>
+       <button onClick={openModalForNewEntry} className="btn btn-primary mb-4  flex justify-center items-center"> <Plus/> New Prescription </button>
         
         <div className="mb-4 flex space-x-3">
           <input
@@ -187,8 +188,8 @@ const PrescriptionList: React.FC = () => {
                   <td className="border px-4 py-2">{prescription.duration}</td>
                   <td className="border px-4 py-2">{prescription.issueDate}</td>
                   <td className="border px-4 py-2 flex space-x-2">
-                    <button onClick={() => openModalForEdit(prescription)} className="btn btn-outline">Edit</button>
-                    <button onClick={() => PrescriptionService.deletePrescription(prescription.prescriptionId).then(fetchPrescriptions)} className="btn btn-danger">Delete</button>
+                    <button onClick={() => openModalForEdit(prescription)} className="btn btn-outline  hover:bg-grey-800">Edit</button>
+                    <button onClick={() => PrescriptionService.deletePrescription(prescription.prescriptionId).then(fetchPrescriptions)} className="btn btn-danger bg-red-400 text-white hover:bg-red-800">Delete</button>
                   </td>
                 </tr>
               ))}

@@ -15,7 +15,7 @@ import java.util.List;
 public class PatientLoginService {
 
     private final PatientLoginRepository patientLoginRepository;
-    private final PatientRepository patRepo;
+    private final PatientRepository patientRepo;
 
     @Autowired
     private EmailSenderService mail;
@@ -23,7 +23,7 @@ public class PatientLoginService {
     @Autowired
     public PatientLoginService(PatientLoginRepository patientLoginRepository, PatientRepository patRepo) {
         this.patientLoginRepository = patientLoginRepository;
-        this.patRepo = patRepo;
+        this.patientRepo = patRepo;
     }
 
     // Create PatientLogin
@@ -104,8 +104,8 @@ public class PatientLoginService {
         return false;
     }
 
-    // Forgot Password
-    public boolean forgotPassword(String username) {
+ // Forgot Password
+    public boolean forgotPassword(String username, String initiator_role) {
         PatientLogin patientLogin = patientLoginRepository.readPatientLogin(username);
         if (patientLogin != null) {
             // Generate a temporary password
@@ -113,22 +113,50 @@ public class PatientLoginService {
             BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
             String encPass = bcrypt.encode(tempPassword);
             patientLogin.setPassword(encPass);
-            patientLoginRepository.updatePatientLogin(patientLogin);
+            String subject = "", body = "";
+            
+            if (initiator_role.equalsIgnoreCase("patient")) {
+                // Send the temporary password to the patient's email
+                subject = "Temporary Password for Your Account";
+                body = "Dear " + username + ",\r\n\r\n" +
+                       "We have generated a temporary password for your account. Please use the following temporary password to log in and reset your password immediately:\r\n\r\n" +
+                       "Temporary Password: " + tempPassword + "\r\n\r\n" +
+                       "If you did not request a password reset, please contact your manager or the system administrators immediately to ensure the security of your account.\r\n\r\n" +
+                       "Thank you for your attention to this matter.\r\n\r\n" +
+                       "Best regards,\r\n" +
+                       "Medicare Support Team";
+            } else if (initiator_role.equalsIgnoreCase("admin")) {
+                subject = "Admin has reset your Account's Password";
 
-            // Send the temporary password to the patient's email
-            String subject = "Temporary Password for Your Account";
-            String body = "Dear " + username + ",\r\n\r\n" +
-                    "We have generated a temporary password for your account. Please use the following temporary password to log in and reset your password immediately:\r\n\r\n" +
-                    "Temporary Password: " + tempPassword + "\r\n\r\n" +
-                    "If you did not request a password reset, please contact your manager or the system administrators immediately to ensure the security of your account.\r\n\r\n" +
-                    "Thank you for your attention to this matter.\r\n\r\n" +
-                    "Best regards,\r\n" +
-                    "Medicare Support Team";
-            Patient pat =  patRepo.readPatient(patientLogin.getPatientId());
-            mail.sendMail(pat.getEmail(), subject, body);
+                body = "Dear " + username + ",\r\n\r\n" +
+                       "Your account password has been reset by the administrator. Please use the following temporary password to log in and reset your password immediately:\r\n\r\n" +
+                       "Temporary Password: " + tempPassword + "\r\n\r\n" +
+                       "If you did not request this password reset, please contact your manager or the system administrators immediately to ensure the security of your account.\r\n\r\n" +
+                       "Thank you for your prompt attention to this matter.\r\n\r\n" +
+                       "Best regards,\r\n" +
+                       "Medicare Support Team";
+            } else {
+                subject = "Urgent: Unauthorized Password Reset Attempt";
+
+                body = "Dear " + username + ",\r\n\r\n" +
+                       "We have detected an unauthorized attempt to reset your account password. For your security, please do not use the temporary password provided and contact your manager or the system administrators immediately to secure your account.\r\n\r\n" +
+                       "If you did not request this password reset, it is crucial to report this incident as soon as possible to prevent any unauthorized access.\r\n\r\n" +
+                       "Thank you for your prompt attention to this matter.\r\n\r\n" +
+                       "Best regards,\r\n" +
+                       "Medicare Support Team";
+                Patient patient = patientRepo.readPatient(patientLogin.getPatientId());
+                mail.sendMail(patient.getEmail(), subject, body);
+                return false;
+            }
+            
+            patientLoginRepository.updatePatientLogin(patientLogin);
+            // get the email from patient Repository..
+            Patient patient = patientRepo.readPatient(patientLogin.getPatientId());
+            mail.sendMail(patient.getEmail(), subject, body);
 
             return true;
         }
         return false;
     }
+
 }

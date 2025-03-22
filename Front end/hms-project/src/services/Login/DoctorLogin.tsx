@@ -28,10 +28,11 @@ class DoctorLogin {
         });
     }
 
-    forgotPassword(username: string) {
+    forgotPassword(username: string, initiator_role:string) {
         return axios.post(`${DOCTOR_LOGIN_URL}/forgot-password`, null, {
             params: {
-                username
+                username,
+                initiator_role
             }
         });
     }

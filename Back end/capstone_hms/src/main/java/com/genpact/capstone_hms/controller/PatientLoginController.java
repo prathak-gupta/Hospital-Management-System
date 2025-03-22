@@ -86,8 +86,8 @@ public class PatientLoginController {
 
     @PostMapping("/forgot-password")
     @ResponseBody
-    public ResponseEntity<String> forgotPassword(@RequestParam String username) {
-        boolean result = patientLoginService.forgotPassword(username);
+    public ResponseEntity<String> forgotPassword(@RequestParam String username, @RequestParam String initiator_role) {
+        boolean result = patientLoginService.forgotPassword(username, initiator_role);
         if (result) {
             return ResponseEntity.ok("Temporary password sent successfully");
         } else {

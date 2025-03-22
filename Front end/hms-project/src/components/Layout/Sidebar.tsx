@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, Calendar, Users, FileText, Pill, CreditCard, FlaskRound as Flask, Bell, Settings, LogOut, UserCircle, ClipboardList, Activity } from 'lucide-react';
+import { Home, Calendar, Users, FileText, Pill, CreditCard, FlaskRound as Flask, Bell, Settings, LogOut, UserCircle, ClipboardList, Activity, Shield, ShieldAlert, ShieldEllipsis, XSquare, BrainCircuit } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 const Sidebar: React.FC = () => {
@@ -9,19 +9,23 @@ const Sidebar: React.FC = () => {
   // Define navigation items based on user role
   const getNavItems = () => {
     const commonItems = [
-      { name: 'Dashboard', path: '/dashboard', icon: <Home size={20} /> },
       // { name: 'Schedule', path: '/appointments', icon: <Calendar size={20} /> },
       // { name: 'Notifications', path: '/notifications', icon: <Bell size={20} /> },
-      { name: 'Settings', path: '/settings', icon: <Settings size={20} /> },
+      { name: 'AI Derm', path: "/derm-ai", icon: <BrainCircuit/>},
+      { name: 'AI Fracture Detector', path: "/ai-fracture-detector", icon: <BrainCircuit/>},
+      { name: 'AI Pharma', path: "/ai-prescription-detector", icon: <BrainCircuit/>},
+      { name: 'Settings', path: '/settings', icon: <Settings size={20} /> }
     ];
 
     if (user?.role === 'admin') {
       return [
-        ...commonItems,
+        { name: 'Dashboard', path: '/dashboard', icon: <Home size={20} /> },
         { name: 'Doctors', path: '/doctors', icon: <Users size={20} /> },
-      { name: 'Schedule', path: '/appointments', icon: <Calendar size={20} /> },
-      { name: 'Patients', path: '/patients', icon: <UserCircle size={20} /> },
+        { name: 'Schedule', path: '/appointments', icon: <Calendar size={20} /> },
+        { name: 'Patients', path: '/patients', icon: <UserCircle size={20} /> },
         { name: 'Billing', path: '/billing', icon: <CreditCard size={20} /> },
+        {name: "Manage Security", path: '/security', icon: <ShieldEllipsis size={20}/>},
+        ...commonItems
         // { name: 'Reports', path: '/reports', icon: <FileText size={20} /> },
         // { name: 'Prescription', path: '/prescriptions', icon: <FileText size={20} /> },
       ];
@@ -29,23 +33,25 @@ const Sidebar: React.FC = () => {
 
     if (user?.role === 'doctor') {
       return [
-        ...commonItems,
+        { name: 'Dashboard', path: '/dashboard', icon: <Home size={20} /> },
         { name: 'My Patients', path: '/my-patients', icon: <UserCircle size={20} /> },
         { name: 'Schedule', path: '/appointments', icon: <Calendar size={20} /> },
         // { name: 'Medical Records', path: '/medical-records', icon: <ClipboardList size={20} /> },
         { name: 'Prescriptions', path: '/prescriptions', icon: <Pill size={20} /> },
         // { name: 'Lab Reports', path: '/lab-reports', icon: <Flask size={20} /> },
+        ...commonItems
       ];
     }
 
     if (user?.role === 'patient') {
       return [
-        ...commonItems,
+        { name: 'Dashboard', path: '/dashboard', icon: <Home size={20} /> },
         // { name: 'Medical Records', path: '/medical-records', icon: <ClipboardList size={20} /> },
         { name: 'Prescriptions', path: '/prescriptions', icon: <Pill size={20} /> },
         // { name: 'Lab Reports', path: '/lab-reports', icon: <Flask size={20} /> },
         { name: 'Billing', path: '/billing', icon: <CreditCard size={20} /> },
         { name: 'Vitals', path: '/vitals', icon: <Activity size={20} /> },
+        ...commonItems,
       ];
     }
 

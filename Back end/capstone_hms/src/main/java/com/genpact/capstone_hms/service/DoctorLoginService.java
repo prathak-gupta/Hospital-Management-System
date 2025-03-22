@@ -105,7 +105,8 @@ public class DoctorLoginService {
     }
 
     // Forgot Password
-    public boolean forgotPassword(String username) {
+    public boolean forgotPassword(String username, String initiator_role) {
+//        System.out.println(initiator_role+": "+username);
         DoctorLogin doctorLogin = doctorLoginRepository.readDoctorLogin(username);
         if (doctorLogin != null) {
             // Generate a temporary password
@@ -113,17 +114,44 @@ public class DoctorLoginService {
             BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
             String encPass = bcrypt.encode(tempPassword);
             doctorLogin.setPassword(encPass);
-            doctorLoginRepository.updateDoctorLogin(doctorLogin);
-
+            String subject="", body="";
+            if(initiator_role.equalsIgnoreCase("doctor")) {
             // Send the temporary password to the doctor's email
-            String subject = "Temporary Password for Your Account";
-            String body = "Dear " + username + ",\r\n\r\n" +
+            subject = "Temporary Password for Your Account";
+            body = "Dear " + username + ",\r\n\r\n" +
                     "We have generated a temporary password for your account. Please use the following temporary password to log in and reset your password immediately:\r\n\r\n" +
                     "Temporary Password: " + tempPassword + "\r\n\r\n" +
                     "If you did not request a password reset, please contact your manager or the system administrators immediately to ensure the security of your account.\r\n\r\n" +
                     "Thank you for your attention to this matter.\r\n\r\n" +
                     "Best regards,\r\n" +
                     "Medicare Support Team";
+            }
+            else if(initiator_role.equalsIgnoreCase("admin")) {
+            	subject = "Admin has reset your Account's Password ";
+
+            	body = "Dear " + username + ",\r\n\r\n" +
+            	              "Your account password has been reset by the administrator. Please use the following temporary password to log in and reset your password immediately:\r\n\r\n" +
+            	              "Temporary Password: " + tempPassword + "\r\n\r\n" +
+            	              "If you did not request this password reset, please contact your manager or the system administrators immediately to ensure the security of your account.\r\n\r\n" +
+            	              "Thank you for your prompt attention to this matter.\r\n\r\n" +
+            	              "Best regards,\r\n" +
+            	              "Medicare Support Team";
+
+            }
+            else {
+            	subject = "Urgent: Unauthorized Password Reset Attempt";
+
+            	body = "Dear " + username + ",\r\n\r\n" +
+            	              "We have detected an unauthorized attempt to reset your account password. For your security, please do not use the temporary password provided and contact your manager or the system administrators immediately to secure your account.\r\n\r\n" +
+            	              "If you did not request this password reset, it is crucial to report this incident as soon as possible to prevent any unauthorized access.\r\n\r\n" +
+            	              "Thank you for your prompt attention to this matter.\r\n\r\n" +
+            	              "Best regards,\r\n" +
+            	              "Medicare Support Team";
+                Doctor doc = docRepo.readDoctor(doctorLogin.getDoctorId());
+                mail.sendMail(doc.getEmail(), subject, body);
+            	return false;
+            }
+            doctorLoginRepository.updateDoctorLogin(doctorLogin);
             // get the email from doctor Repository..
             Doctor doc = docRepo.readDoctor(doctorLogin.getDoctorId());
             mail.sendMail(doc.getEmail(), subject, body);
