@@ -66,6 +66,12 @@ public class PrescriptionController {
         List<Prescription> prescriptions = prescriptionService.getAllPrescriptionsByDoctor(id);
         return ResponseEntity.ok(prescriptions);
     }
+    
+    @GetMapping("/my-prescriptions/{patId}")
+    public ResponseEntity<List<Prescription>> getAllPrescriptionsByPatients(@PathVariable int patId) {
+    	List<Prescription> prescriptions = prescriptionService.getAllPrescriptionsByPatients(patId);
+        return ResponseEntity.ok(prescriptions);
+    }
 //    @GetMapping("/my-patients/{doctorId}")
 //    public ResponseEntity<List<Patient>> getPatientsByDoctor(@PathVariable int doctorId) {
 //        List<Patient> patients = prescriptionService.getPatientsByDoctor(doctorId);

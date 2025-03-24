@@ -12,7 +12,6 @@ public class EmailSenderService {
 	private JavaMailSender mailSender;
 	
 	
-	
 	public EmailSenderService(JavaMailSender mailSender) {
 		super();
 		this.mailSender = mailSender;

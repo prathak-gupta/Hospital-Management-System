@@ -78,7 +78,7 @@ const DoctorDashboard: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white overflow-hidden shadow rounded-lg">
+        {/* <div className="bg-white overflow-hidden shadow rounded-lg">
           <div className="p-5">
             <div className="flex items-center">
               <div className="flex-shrink-0 bg-yellow-100 rounded-md p-3">
@@ -101,7 +101,7 @@ const DoctorDashboard: React.FC = () => {
               </a>
             </div>
           </div>
-        </div>
+        </div> */}
 
         <div className="bg-white overflow-hidden shadow rounded-lg">
           <div className="p-5">

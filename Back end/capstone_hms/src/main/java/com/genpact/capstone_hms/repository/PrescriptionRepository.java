@@ -140,6 +140,17 @@ public class PrescriptionRepository {
             return null;
         }
     }
+    
+    public List<Prescription> getAllPrescriptionsByPatients(int patId) {
+        String sql = "SELECT * FROM prescriptions where patientID=?";
+        try {
+            return prescriptionJdbc.query(sql, prescriptionRowMapper,patId);
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
 
 //    // Get Patients by Doctor
 //    public List<Patient> getPatientsByDoctor(int doctorId) {

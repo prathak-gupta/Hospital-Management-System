@@ -42,6 +42,10 @@ class PrescriptionService {
   getAllPrescriptionsByDoctor(docId: number): Promise<AxiosResponse<Prescription[]>> {
     return axios.get(`${API_URL}/all/${docId}`);
     }
+
+  getAllPrescriptionsByPatient(patId: number): Promise<AxiosResponse<Prescription[]>> {
+      return axios.get(`${API_URL}/my-prescriptions/${patId}`);
+      }
 }
 
 export default new PrescriptionService();

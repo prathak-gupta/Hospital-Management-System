@@ -88,4 +88,16 @@ public class BillingRepository {
             return null;
         }
     }
+    
+    public List<Billing> getAllBillsByPatient(int id)
+    {
+    	String sql = "SELECT * FROM Billing WHERE patientID=? ORDER BY bill_id DESC";
+        try {
+            return billingJdbc.query(sql, billingRowMapper, id);
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

@@ -1,22 +1,54 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, Clock, User, FileText } from 'lucide-react';
-import { mockDoctors } from '../../data/mockData';
+import AppointmentService from '../../services/Appointment';
+import BillingService from '../../services/BillingService';
+import DoctorService from '../../services/DoctorService';
 import { useAuth } from '../../context/AuthContext';
+
+interface Doctor {
+  doctorID: number;
+  firstName: string;
+  lastName: string;
+  specialization?: string;
+  phoneNumber?: string;
+  email?: string;
+  department?: string;
+  qualification?: string;
+  yearsOfExperience?: number;
+  charges?: number;
+  registrationDate: string;
+}
 
 const AppointmentForm: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   
   const [formData, setFormData] = useState({
-    doctorId: '',
+    doctorID: '',
     date: '',
     time: '',
-    type: 'checkup',
+    type: '',
     notes: '',
   });
   
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [doctors, setDoctors] = useState<Doctor[]>([]);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState('Credit Card');
+
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      try {
+        const response = await DoctorService.getAllDoctors();
+        setDoctors(response.data);
+      } catch (error) {
+        console.error('Failed to fetch doctors:', error);
+      }
+    };
+
+    fetchDoctors();
+  }, []);
   
   const appointmentTypes = [
     { id: 'checkup', label: 'Regular Checkup' },
@@ -29,7 +61,6 @@ const AppointmentForm: React.FC = () => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
     
-    // Clear error when field is updated
     if (errors[name]) {
       setErrors(prev => {
         const newErrors = { ...prev };
@@ -42,8 +73,8 @@ const AppointmentForm: React.FC = () => {
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
     
-    if (!formData.doctorId) {
-      newErrors.doctorId = 'Please select a doctor';
+    if (!formData.doctorID) {
+      newErrors.doctorID = 'Please select a doctor';
     }
     
     if (!formData.date) {
@@ -60,22 +91,59 @@ const AppointmentForm: React.FC = () => {
     
     if (!formData.time) {
       newErrors.time = 'Please select a time';
+    } else {
+      const selectedDateTime = new Date(`${formData.date}T${formData.time}`);
+      if (selectedDateTime < new Date()) {
+        newErrors.time = 'Please select a future time';
+      }
     }
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (validateForm()) {
-      // In a real app, this would be an API call
-      console.log('Appointment data:', formData);
-      
-      // Simulate success and redirect
-      alert('Appointment request submitted successfully!');
-      navigate('/appointments');
+      try {
+        await AppointmentService.createAppointment({
+          appointmentID: 0,
+          patientID: user?.id || 0,
+          doctorID: parseInt(formData.doctorID),
+          appointmentDate: formData.date,
+          appointmentTime: `${formData.time}:00`,
+          reason: formData.notes,
+          appointmentType: formData.type as 'checkup' | 'follow-up' | 'consultation' | 'emergency',
+          registrationTime: new Date().toISOString()
+        });
+        
+        setShowPaymentModal(true);
+      } catch (error) {
+        console.error('Failed to create appointment:', error);
+        alert('Failed to create appointment. Please try again.');
+      }
+    }
+  };
+
+  const handlePayment = async () => {
+    try {
+      await BillingService.registerBilling({
+        billID: 0,
+        patientID: user?.id || 0,
+        amount: 100, // Example amount
+        paymentStatus: 'Completed',
+        paymentMethod,
+        billingStatus: 'Paid',
+        createdBy: paymentMethod === 'Credit Card' ? 111 : paymentMethod === 'Debit Card' ? 222 : paymentMethod === 'PayPal' ? 333 : paymentMethod === 'UPI' ? 444 : 404
+      });
+
+      alert('Payment successful and billing entry created!');
+      setShowPaymentModal(false);
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Failed to process payment:', error);
+      alert('Failed to process payment. Please try again.');
     }
   };
 
@@ -93,7 +161,7 @@ const AppointmentForm: React.FC = () => {
       <form onSubmit={handleSubmit} className="px-4 py-5 sm:p-6">
         <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
           <div className="sm:col-span-3">
-            <label htmlFor="doctorId" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="doctorID" className="block text-sm font-medium text-gray-700">
               Select Doctor
             </label>
             <div className="mt-1 relative rounded-md shadow-sm">
@@ -101,24 +169,24 @@ const AppointmentForm: React.FC = () => {
                 <User className="h-5 w-5 text-gray-400" />
               </div>
               <select
-                id="doctorId"
-                name="doctorId"
-                value={formData.doctorId}
+                id="doctorID"
+                name="doctorID"
+                value={formData.doctorID}
                 onChange={handleChange}
                 className={`block w-full pl-10 pr-3 py-2 border ${
-                  errors.doctorId ? 'border-red-300' : 'border-gray-300'
+                  errors.doctorID ? 'border-red-300' : 'border-gray-300'
                 } rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm`}
               >
                 <option value="">Select a doctor</option>
-                {mockDoctors.map(doctor => (
-                  <option key={doctor.id} value={doctor.id}>
-                    {doctor.name} - {doctor.specialty}
+                {doctors.map(doctor => (
+                  <option key={doctor.doctorID} value={doctor.doctorID}>
+                    {doctor.firstName} {doctor.lastName} - {doctor.specialization}
                   </option>
                 ))}
               </select>
             </div>
-            {errors.doctorId && (
-              <p className="mt-2 text-sm text-red-600">{errors.doctorId}</p>
+            {errors.doctorID && (
+              <p className="mt-2 text-sm text-red-600">{errors.doctorID}</p>
             )}
           </div>
 
@@ -243,8 +311,99 @@ const AppointmentForm: React.FC = () => {
           </button>
         </div>
       </form>
-    </div>
-  );
+
+      {showPaymentModal && (
+        <div className="fixed z-10 inset-0 overflow-y-auto">
+          <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div className="fixed inset-0 transition-opacity" aria-hidden="true">
+              <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+
+            {/* This element is to trick the browser into centering the modal contents. */}
+            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+            <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full sm:p-6 sm:align-middle">
+              <h3 className="text-lg leading-6 font-medium text-gray-900">Simulate Payment Gateway</h3>
+              <div className="mt-2">
+                <p>Select Payment Method:</p>
+                <select
+                  name="paymentMethod"
+                  value={paymentMethod}
+                  onChange={(e) => setPaymentMethod(e.target.value)}
+                  className="block w-full mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+                >
+                  <option value="Credit Card">Credit Card</option>
+                  <option value="Debit Card">Debit Card</option>
+                  <option value="PayPal">Paytm</option>
+                  <option value="UPI">UPI</option> {/* Added UPI method */}
+                  {/* Add more payment methods as needed */}
+                </select>
+              </div>
+
+              {/* Simulated Payment Details */}
+              <div className='mt-4'>
+                 {/* Simulated Payment Details */}
+                 {paymentMethod === "Credit Card" && (
+                   <>
+                     <label htmlFor='cardNumber' className='block text-sm font-medium text-gray700'>
+                       Card Number
+                     </label>
+                     <input
+                       type='text'
+                       id='cardNumber'
+                       name='cardNumber'
+                       placeholder='1234 5678 9012 3456'
+                       className='mt1 block w-full border bordergray300 rounded-md shadow-sm focus:outline-none focus:ringprimary focus:border-primary sm:textsm'
+                     />
+                     {/* Add more fields as needed */}
+                   </>
+                 )}
+                 {paymentMethod === "Debit Card" && (
+                   <>
+                     {/* Similar fields for Debit Card */}
+                     {/* Add more fields as needed */}
+                   </>
+                 )}
+                 {paymentMethod === "PayPal" && (
+                   <>
+                     {/* Similar fields for PayPal */}
+                     {/* Add more fields as needed */}
+                   </>
+                 )}
+                 {paymentMethod === "UPI" && (
+                   <>
+                     {/* Similar fields for UPI */}
+                     {/* Add more fields as needed */}
+                   </>
+                 )}
+               </div>
+
+               {/* Payment Buttons */}
+               <div className='mt4 flex justify-end space-x3'>
+                 <button
+                   type='button'
+                   onClick={() => setShowPaymentModal(false)}
+                   className='btn btn-outline'
+                 >
+                   Cancel
+                 </button>
+                 <button type='button' onClick={handlePayment} className='btn btn-primary'>
+                   Pay Now
+                 </button>
+               </div>
+
+             </div>
+
+           </div>
+
+         </div>
+
+       )}
+
+     </div>
+
+   );
+
 };
 
 export default AppointmentForm;

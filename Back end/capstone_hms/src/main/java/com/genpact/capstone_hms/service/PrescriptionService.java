@@ -53,7 +53,9 @@ public class PrescriptionService {
         return prescriptionRepository.getAllPrescriptionsByDoctor(docId);
     }
         
-    
+    public List<Prescription> getAllPrescriptionsByPatients(int patId) {
+    	return prescriptionRepository.getAllPrescriptionsByPatients(patId);
+    }
 //    // Get Patients by Doctor
 //    public List<Patient> getPatientsByDoctor(int doctorId) {
 //        return prescriptionRepository.getPatientsByDoctor(doctorId);

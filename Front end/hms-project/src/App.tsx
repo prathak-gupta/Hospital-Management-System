@@ -24,6 +24,7 @@ import FractureDetector from './components/AI/FractureDetector';
 import AdminProfile from './components/MyProfile/AdminProfile';
 import DoctorProfile from './components/MyProfile/DoctorProfile';
 import PatientProfile from './components/MyProfile/PatientProfile';
+import PatientPrescription from './components/Prescriptions/PatientPrescription';
 
 // Protected route component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -47,7 +48,7 @@ function App() {
         <Routes>
           <Route path="/login" element={<LoginForm />} />
           
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Home/>} />
           
           <Route path="/" element={
             <ProtectedRoute>
@@ -62,6 +63,7 @@ function App() {
             <Route path="medical-records" element={<PatientRecords />} />
             <Route path="prescriptions" element={<PrescriptionList />} />
             <Route path="billing" element={<PatientBilling />} />
+            <Route path="all-billing" element={<BillingList />} />
             <Route path="lab-reports" element={<LabReportList />} />
             <Route path="notifications" element={<NotificationList />} />
             <Route path="vitals" element={<VitalsMonitor />} />
@@ -79,6 +81,7 @@ function App() {
             <Route path="/admin_profile" element={<AdminProfile />} />
             <Route path="/doctor_profile" element={<DoctorProfile />} />
             <Route path="/patient_profile" element={<PatientProfile />} />
+            <Route path="/my-prescriptions" element={<PatientPrescription />} />
             
             {/* Add more routes as needed */}
             <Route path="*" element={<div>Page not found</div>} />

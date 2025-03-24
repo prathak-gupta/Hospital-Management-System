@@ -36,4 +36,9 @@ public class BillingService {
     public List<Billing> getAllBillings() {
         return billingRepository.getAllBillings();
     }
+    
+    public List<Billing> getAllBillsByPatient(int id){
+    	return billingRepository.getAllBillsByPatient(id);
+    }
+
 }

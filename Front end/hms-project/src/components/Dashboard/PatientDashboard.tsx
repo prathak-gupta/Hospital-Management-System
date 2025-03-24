@@ -43,7 +43,7 @@ const PatientDashboard: React.FC = () => {
               </div>
               <div className="ml-5 w-0 flex-1">
                 <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">Upcoming Appointments</dt>
+                  <dt className="text-sm font-medium text-gray-500 truncate">My Appointments</dt>
                   <dd>
                     <div className="text-lg font-medium text-gray-900">{upcomingAppointments.length}</div>
                   </dd>
@@ -68,7 +68,7 @@ const PatientDashboard: React.FC = () => {
               </div>
               <div className="ml-5 w-0 flex-1">
                 <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">Active Prescriptions</dt>
+                  <dt className="text-sm font-medium text-gray-500 truncate">My Prescriptions</dt>
                   <dd>
                     <div className="text-lg font-medium text-gray-900">{patientPrescriptions.length}</div>
                   </dd>
@@ -78,7 +78,7 @@ const PatientDashboard: React.FC = () => {
           </div>
           <div className="bg-gray-50 px-5 py-3">
             <div className="text-sm">
-              <a href="/prescriptions" className="font-medium text-primary-600 hover:text-primary-900">
+              <a href="/my-prescriptions" className="font-medium text-primary-600 hover:text-primary-900">
                 View prescriptions
               </a>
             </div>
@@ -93,7 +93,7 @@ const PatientDashboard: React.FC = () => {
               </div>
               <div className="ml-5 w-0 flex-1">
                 <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">Pending Bills</dt>
+                  <dt className="text-sm font-medium text-gray-500 truncate">My Bills</dt>
                   <dd>
                     <div className="text-lg font-medium text-gray-900">{pendingBills.length}</div>
                   </dd>
@@ -109,31 +109,6 @@ const PatientDashboard: React.FC = () => {
             </div>
           </div>
         </div>
-
-        {/* <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0 bg-purple-100 rounded-md p-3">
-                <FileText className="h-6 w-6 text-purple-600" />
-              </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">Lab Reports</dt>
-                  <dd>
-                    <div className="text-lg font-medium text-gray-900">{patientLabReports.length}</div>
-                  </dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-          <div className="bg-gray-50 px-5 py-3">
-            <div className="text-sm">
-              <a href="/lab-reports" className="font-medium text-primary-600 hover:text-primary-900">
-                View reports
-              </a>
-            </div>
-          </div>
-        </div> */}
       </div>
 
       {/* Upcoming Appointments */}

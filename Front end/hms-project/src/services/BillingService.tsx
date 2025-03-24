@@ -36,6 +36,12 @@ class BillingService {
   searchBilling(keyword: string): Promise<AxiosResponse<Billing[]>> {
     return axios.get(`${API_URL}/search?keyword=${keyword}`);
   }
+
+  getAllBillsByPatient( id: number)
+  {
+    return axios.get(`${API_URL}/my-bills/${id}`);
+  }
+
 }
 
 export default new BillingService();
