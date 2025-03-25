@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { Activity, Mail, Lock, AlertCircle, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import DoctorLogin from '../../services/Login/DoctorLogin';
@@ -44,8 +44,12 @@ const LoginForm: React.FC = () => {
     emergencyContactPhone: '',
     registration_date: ""
   });
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const navigate = useNavigate();
+  if(user){
+    console.log("User Already Auhtenticated..")
+    return <Navigate to="/dashboard" replace />;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -28,6 +28,8 @@ import PatientPrescription from './components/Prescriptions/PatientPrescription'
 import MyAppointment from './components/Appointments/MyAppointments';
 import ViewAllAppointments from './components/Appointments/ViewAllAppointments';
 import NotFoundPage from './context/NotFoundPage';
+import DermAi from './components/AI/DermAI';
+import AiPharmaReader from './components/AI/AiPharmaReader';
 
 // Protected route component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -82,8 +84,8 @@ function App() {
             <Route path="/security" element={<Security />} />
 
             <Route path="/ai-fracture-detector" element={<FractureDetector />} />
-            <Route path="/derm-ai" element={<FractureDetector />} />
-            <Route path="/ai-prescription-detector" element={<FractureDetector />} />
+            <Route path="/derm-ai" element={<DermAi />} />
+            <Route path="/ai-prescription-detector" element={<AiPharmaReader />} />
             <Route path="/admin_profile" element={<AdminProfile />} />
             <Route path="/doctor_profile" element={<DoctorProfile />} />
             <Route path="/patient_profile" element={<PatientProfile />} />
@@ -91,6 +93,7 @@ function App() {
             <Route path="/my-appointments" element={<MyAppointment />} />
             <Route path="/all-appointments" element={<ViewAllAppointments />} />
             <Route path="/404-not-found" element={<NotFoundPage />} />
+            <Route path="/appointment/new" element={<AppointmentForm />} />
             
             {/* Add more routes as needed */}
             <Route path="*" element={<div>Page not found</div>} />

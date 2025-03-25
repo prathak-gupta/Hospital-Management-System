@@ -43,17 +43,6 @@ CREATE TABLE IF NOT EXISTS prescriptions (
     FOREIGN KEY (DoctorID) REFERENCES doctors(DoctorID)
 );
 
--- Staff Table
-CREATE TABLE if not exists Staff (
-    StaffID INT AUTO_INCREMENT PRIMARY KEY,
-    FirstName VARCHAR(50) NOT NULL,
-    LastName VARCHAR(50) NOT NULL,
-    Role VARCHAR(50),
-    PhoneNumber VARCHAR(15),
-    Email VARCHAR(100),
-    Department VARCHAR(100),
-    Hire_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
 
 -- Admins Table
 CREATE TABLE if not exists Admins (
@@ -118,11 +107,3 @@ CREATE TABLE if not exists PatientsLogin (
     FOREIGN KEY (PatientID) REFERENCES Patients(PatientID) ON DELETE CASCADE
 );
 
--- Staff Login Table
-CREATE TABLE if not exists StaffLogin (
-    LoginID INT AUTO_INCREMENT PRIMARY KEY,
-    StaffID INT,
-    Username VARCHAR(50) NOT NULL,
-    Password VARCHAR(255) NOT NULL,
-    FOREIGN KEY (StaffID) REFERENCES Staff(StaffID) ON DELETE CASCADE
-);

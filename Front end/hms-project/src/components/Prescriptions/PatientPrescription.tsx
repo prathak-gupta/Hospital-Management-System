@@ -34,6 +34,7 @@ const PatientPrescription: React.FC = () => {
     try {
       const response = await PrescriptionService.getAllPrescriptionsByPatient(user?.id || 0);
       setPrescriptions(response.data);
+      console.log("Data",response.data)
     } catch (error) {
       console.error('Error fetching prescriptions:', error);
     }
@@ -77,7 +78,7 @@ const PatientPrescription: React.FC = () => {
             View and manage patient prescriptions
           </p>
         </div>
-        {user?.role === 'doctor' && (
+        {/* {user?.role === 'doctor' && (
           <button
             type="button"
             className="btn btn-primary flex items-center"
@@ -85,7 +86,7 @@ const PatientPrescription: React.FC = () => {
             <Plus className="h-4 w-4 mr-2" />
             New Prescription
           </button>
-        )}
+        )} */}
       </div>
 
       {/* Search and Filter */}
@@ -234,14 +235,14 @@ const PatientPrescription: React.FC = () => {
               </dl>
             </div>
             <div className="px-4 py-4 sm:px-6 bg-gray-50 flex justify-end space-x-3 rounded-b-lg">
-              {user?.role === 'doctor' && (
+              {/* {user?.role === 'doctor' && (
                 <button
                   type="button"
                   className="btn btn-primary"
                 >
                   Edit Prescription
                 </button>
-              )}
+              )} */}
               <button
                 type="button"
                 onClick={closeModal}

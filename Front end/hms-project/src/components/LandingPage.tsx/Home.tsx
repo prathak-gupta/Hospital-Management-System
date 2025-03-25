@@ -300,7 +300,7 @@ function Home() {
                     <li><button onClick={() => setCurrentPage('services')} className="hover:text-white">Services</button></li>
                     <li><button onClick={() => setCurrentPage('about')} className="hover:text-white">About Us</button></li>
                     <li><a href="#doctors" className="hover:text-white">Our Doctors</a></li>
-                    <li><a href="#consoles" className="hover:text-white">Login</a></li>
+                    <li><a href="/login" className="hover:text-white">Login</a></li>
                   </ul>
                 </div>
                 <div>
@@ -395,9 +395,9 @@ function ConsoleCard({ icon, title, description, features, active, onClick }: Co
           </li>
         ))}
       </ul>
-      <button className="mt-6 w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition">
+      {/* <button className="mt-6 w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition">
         Access Console
-      </button>
+      </button> */}
     </div>
   );
 }

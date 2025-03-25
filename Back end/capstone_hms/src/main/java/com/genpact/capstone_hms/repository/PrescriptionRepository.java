@@ -142,7 +142,7 @@ public class PrescriptionRepository {
     }
     
     public List<Prescription> getAllPrescriptionsByPatients(int patId) {
-        String sql = "SELECT * FROM prescriptions where doctorId=? && patientID=?";
+        String sql = "SELECT * FROM prescriptions where patientID=?";
         try {
             return prescriptionJdbc.query(sql, prescriptionRowMapper,patId);
         } catch (Exception e) {

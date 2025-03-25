@@ -114,12 +114,12 @@ const MyPatients: React.FC = () => {
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">All Patients</h1>
       <div className="flex justify-end mb-4">
-        <button
+        {/* <button
           className={"mr-2 text-green-700"}
           onClick={() => setIsAddModalOpen(true)}
         >
           <Plus size={24} />
-        </button>
+        </button> */}
         <button
           className={`mr-2 ${viewMode === "table" ? "text-blue-600" : "text-gray-600"}`}
           onClick={() => setViewMode("table")}

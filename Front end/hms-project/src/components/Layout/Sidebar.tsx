@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, Calendar, Users, FileText, Pill, CreditCard, FlaskRound as Flask, Bell, Settings, LogOut, UserCircle, ClipboardList, Activity, Shield, ShieldAlert, ShieldEllipsis, XSquare, BrainCircuit, User, File, Album } from 'lucide-react';
+import { Home, Calendar, Users, FileText, Pill, CreditCard, FlaskRound as Flask, Bell, Settings, LogOut, UserCircle, ClipboardList, Activity, Shield, ShieldAlert, ShieldEllipsis, XSquare, BrainCircuit, User, File, Album, Plus, PlusCircle } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 const Sidebar: React.FC = () => {
@@ -49,7 +49,8 @@ const Sidebar: React.FC = () => {
       return [
         { name: 'Dashboard', path: '/dashboard', icon: <Home size={20} /> },
         // { name: 'Medical Records', path: '/medical-records', icon: <ClipboardList size={20} /> },
-        { name: 'Appointment', path: '/my-appointments', icon: <Calendar size={20} /> },
+        { name: 'New Appointment', path: '/appointment/new', icon: <PlusCircle size={20} /> },
+        { name: 'My Appointment', path: '/my-appointments', icon: <Calendar size={20} /> },
         { name: 'Prescriptions', path: '/my-prescriptions', icon: <Pill size={20} /> },
         // { name: 'Lab Reports', path: '/lab-reports', icon: <Flask size={20} /> },
         { name: 'Billing', path: '/my-billing', icon: <CreditCard size={20} /> },

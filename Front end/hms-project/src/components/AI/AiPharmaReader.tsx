@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 
 export default function AiPharmaReader() {
   useEffect(() => {
-    window.location.href = "https://prescription-final-genpact.netlify.app/";
+    window.location.href = "https://prescription-genpact-final.netlify.app/";
   }, []);
 
   return (
