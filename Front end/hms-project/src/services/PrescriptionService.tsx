@@ -36,11 +36,20 @@ class PrescriptionService {
   }
 
 
-  searchPrescriptions(keyword: string, doctorId: number): Promise<AxiosResponse<Prescription[]>> {
+  searchPrescriptions(keyword: string, id: number): Promise<AxiosResponse<Prescription[]>> {
     return axios.get(`${API_URL}/search`, {
         params: {
             keyword: keyword,
-            id: doctorId
+            id: id
+        }
+    });
+  }
+
+  searchPrescriptionsPatients(keyword: string, id: number): Promise<AxiosResponse<Prescription[]>> {
+    return axios.get(`${API_URL}/search/patienst`, {
+        params: {
+            keyword: keyword,
+            id: id
         }
     });
   }

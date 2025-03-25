@@ -11,9 +11,7 @@ const Sidebar: React.FC = () => {
     const commonItems = [
       // { name: 'Schedule', path: '/appointments', icon: <Calendar size={20} /> },
       // { name: 'Notifications', path: '/notifications', icon: <Bell size={20} /> },
-      { name: 'AI Derm', path: "/derm-ai", icon: <BrainCircuit/>},
-      { name: 'AI Fracture Detector', path: "/ai-fracture-detector", icon: <BrainCircuit/>},
-      { name: 'AI Pharma', path: "/ai-prescription-detector", icon: <BrainCircuit/>},
+
       { name: 'Settings', path: '/settings', icon: <Settings size={20} /> }
     ];
 
@@ -26,6 +24,9 @@ const Sidebar: React.FC = () => {
         { name: 'Billing', path: '/all-billing', icon: <CreditCard size={20} /> },
         { name: 'My Profile', path: '/admin_profile', icon: <UserCircle size={20} /> },
         {name: "Manage Security", path: '/security', icon: <ShieldEllipsis size={20}/>},
+        { name: 'AI Derm', path: "/derm-ai", icon: <BrainCircuit/>},
+        { name: 'AI Fracture Detector', path: "/ai-fracture-detector", icon: <BrainCircuit/>},
+        { name: 'AI Pharma', path: "/ai-prescription-detector", icon: <BrainCircuit/>},
         ...commonItems
         // { name: 'Reports', path: '/reports', icon: <FileText size={20} /> },
         // { name: 'Prescription', path: '/prescriptions', icon: <FileText size={20} /> },
@@ -35,11 +36,15 @@ const Sidebar: React.FC = () => {
     if (user?.role === 'doctor') {
       return [
         { name: 'Dashboard', path: '/dashboard', icon: <Home size={20} /> },
-        { name: 'Appointment', path: '/my-patients', icon: <Album size={20} /> },
+        { name: 'My Patients', path: '/my-patients', icon: <Users size={20} /> },
+        { name: 'Appointments', path: '/doc-appointments', icon: <Album size={20} /> },
         { name: 'Schedule', path: '/appointments', icon: <Calendar size={20} /> },
         // { name: 'Medical Records', path: '/medical-records', icon: <ClipboardList size={20} /> },
         { name: 'Prescriptions', path: '/prescriptions', icon: <Pill size={20} /> },
         { name: 'My Profile', path: '/doctor_profile', icon: <UserCircle size={20} /> },
+        { name: 'AI Derm', path: "/derm-ai", icon: <BrainCircuit/>},
+        { name: 'AI Fracture Detector', path: "/ai-fracture-detector", icon: <BrainCircuit/>},
+        { name: 'AI Pharma', path: "/ai-prescription-detector", icon: <BrainCircuit/>},
         // { name: 'Lab Reports', path: '/lab-reports', icon: <Flask size={20} /> },
         ...commonItems
       ];
@@ -56,6 +61,7 @@ const Sidebar: React.FC = () => {
         { name: 'Billing', path: '/my-billing', icon: <CreditCard size={20} /> },
         { name: 'Vitals', path: '/vitals', icon: <Activity size={20} /> },
         { name: 'My Profile', path: '/patient_profile', icon: <UserCircle size={20} /> },
+        { name: 'AI Pharma', path: "/ai-prescription-detector", icon: <BrainCircuit/>},
         ...commonItems,
       ];
     }

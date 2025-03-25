@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import AppointmentService from "../../services/Appointment";
 import { Grid, Table, Edit, Trash2, Plus } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
 
 interface Appointment {
   appointmentID: number;
@@ -19,8 +20,10 @@ const ViewAllAppointments: React.FC = () => {
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
   const [errors, setErrors] = useState<string[]>([]);
+  const {user} = useAuth();
 
   useEffect(() => {
+    if(user?.role==="admin"){
     AppointmentService.getAllAppointments()
       .then(response => {
         setAppointments(response.data);
@@ -29,7 +32,18 @@ const ViewAllAppointments: React.FC = () => {
       .catch(error => {
         console.log(error);
       });
-  }, []);
+  }else if(user?.role ==="doctor")
+    {
+      AppointmentService.getAppointmentsByDoctor(user.id)
+      .then(response => {
+        setAppointments(response.data);
+        console.log(response.data);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+    }
+}, []);
 
   const [appointmentData, setAppointmentData] = useState<Appointment>({
     appointmentID: 0,
@@ -134,7 +148,7 @@ const ViewAllAppointments: React.FC = () => {
       {viewMode === "table" ? (
         <div className="overflow-x-auto rounded-lg">
           <table className="min-w-full bg-white rounded-lg">
-            <thead className="bg-secondary-200 rounded-t-lg">
+            <thead className="bg-purple-200 rounded-t-lg">
               <tr>
                 <th className="py-2 px-4 border-b">Appointment ID</th>
                 <th className="py-2 px-4 border-b">Patient ID</th>

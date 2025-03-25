@@ -60,6 +60,12 @@ class AppointmentService {
   getAppointmentsByPatient(patId: number): Promise<AxiosResponse<Appointment[]>>{
     return axios.get(`${API_URL}/my-appointments/${patId}`);
   }
+
+  
+  getAppointmentsByDoctor(docId: number): Promise<AxiosResponse<Appointment[]>>{
+    return axios.get(`${API_URL}/doc-appo/${docId}`);
+  }
+
    getAllAppointmentCount() {
     return axios.get(`${API_URL}/all-count`);
 }

@@ -94,6 +94,7 @@ function App() {
             <Route path="/all-appointments" element={<ViewAllAppointments />} />
             <Route path="/404-not-found" element={<NotFoundPage />} />
             <Route path="/appointment/new" element={<AppointmentForm />} />
+            <Route path="/doc-appointments" element={<ViewAllAppointments />} />
             
             {/* Add more routes as needed */}
             <Route path="*" element={<div>Page not found</div>} />
