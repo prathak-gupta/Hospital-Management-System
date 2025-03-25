@@ -40,8 +40,8 @@ public class PrescriptionService {
     }
 
     // Search Prescriptions
-    public List<Prescription> searchPrescriptions(String keyword) {
-        return prescriptionRepository.searchPrescriptions(keyword);
+    public List<Prescription> searchPrescriptions(String keyword, int docId) {
+        return prescriptionRepository.searchPrescriptions(keyword, docId);
     }
 
     // Get All Prescriptions
@@ -55,6 +55,14 @@ public class PrescriptionService {
         
     public List<Prescription> getAllPrescriptionsByPatients(int patId) {
     	return prescriptionRepository.getAllPrescriptionsByPatients(patId);
+    }
+    
+    public int getAllPrescriptionsCountByPatients(int patId) {
+    	return prescriptionRepository.getAllPrescriptionsCountByPatients(patId);
+    }
+    
+    public int getAllPrescriptionsCountByDoctor(int docId) {
+    	return prescriptionRepository.getAllPrescriptionsCountByDoctor(docId);
     }
 //    // Get Patients by Doctor
 //    public List<Patient> getPatientsByDoctor(int doctorId) {

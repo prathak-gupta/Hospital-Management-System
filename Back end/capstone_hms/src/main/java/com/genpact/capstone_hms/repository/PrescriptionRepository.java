@@ -106,11 +106,11 @@ public class PrescriptionRepository {
     }
 
     // Search Prescriptions
-    public List<Prescription> searchPrescriptions(String keyword) {
-        String sql = "SELECT * FROM prescriptions WHERE medication_name LIKE ? OR notes LIKE ?";
+    public List<Prescription> searchPrescriptions(String keyword,int docId) {
+        String sql = "SELECT * FROM prescriptions WHERE doctorId=? && (medication_name LIKE ? OR notes LIKE ?)";
         try {
             String formattedKeyword = "%" + keyword.trim().replaceAll("\\s+", " ") + "%";
-            return prescriptionJdbc.query(sql, prescriptionRowMapper, formattedKeyword, formattedKeyword);
+            return prescriptionJdbc.query(sql, prescriptionRowMapper,docId, formattedKeyword, formattedKeyword);
         } catch (Exception e) {
             System.err.println("Error: " + e.getMessage());
             e.printStackTrace();
@@ -142,7 +142,7 @@ public class PrescriptionRepository {
     }
     
     public List<Prescription> getAllPrescriptionsByPatients(int patId) {
-        String sql = "SELECT * FROM prescriptions where patientID=?";
+        String sql = "SELECT * FROM prescriptions where doctorId=? && patientID=?";
         try {
             return prescriptionJdbc.query(sql, prescriptionRowMapper,patId);
         } catch (Exception e) {
@@ -151,7 +151,33 @@ public class PrescriptionRepository {
             return null;
         }
     }
-
+    
+    //for patients dashboard..
+    public int getAllPrescriptionsCountByPatients(int patId) {
+        String sql = "SELECT * FROM prescriptions where patientID=?";
+        try {
+            List<Prescription> pres =prescriptionJdbc.query(sql, prescriptionRowMapper, patId);
+            return pres.size();
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
+            e.printStackTrace();
+            return -1;
+        }
+    }
+    
+      // for doctor dashboard..
+    public int getAllPrescriptionsCountByDoctor(int docId) {
+        String sql = "SELECT * FROM prescriptions where doctorID=?";
+        try {
+            List<Prescription> pres = prescriptionJdbc.query(sql, prescriptionRowMapper,docId);
+            return pres.size();
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
+            e.printStackTrace();
+            return -1;
+        }
+    }
+    
 //    // Get Patients by Doctor
 //    public List<Patient> getPatientsByDoctor(int doctorId) {
 //        String sql = "SELECT p.* FROM patients p JOIN prescriptions pr ON p.patientId = pr.patientId WHERE pr.doctorId = ?";

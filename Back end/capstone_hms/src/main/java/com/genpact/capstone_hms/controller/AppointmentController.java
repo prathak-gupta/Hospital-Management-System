@@ -65,4 +65,25 @@ public class AppointmentController {
         List<Patient> appointments = appointmentService.getPatientsByDoctor(doctorId);
         return ResponseEntity.ok(appointments);
     }
+    
+    @GetMapping("/my-appointments/{patId}")
+    public ResponseEntity<List<Appointment>> getAllAppointmentsbyPatient(@PathVariable int patId) {
+    	List <Appointment> appointments = appointmentService.getAllAppointmentsbyPatient(patId);
+    	return ResponseEntity.ok(appointments);
+    }
+    
+    @GetMapping("/all-count")
+    public int getAllAppointmentCount() {
+        return appointmentService.getAllAppointmentCount();
+    }
+
+    @GetMapping("/count-appo/{patId}")
+    public int getAllAppointmentCountByPatients(@PathVariable int patId) {
+    	return appointmentService.getAllAppointmentCountByPatients(patId);
+    }
+    
+    @GetMapping("/count-doc-appo/{docId}")
+    public int getAllAppointmentCountByDoctor(@PathVariable int docId) {
+    	return appointmentService.getAllAppointmentsCountByDoctor(docId);
+    }
 }

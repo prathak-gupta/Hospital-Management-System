@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import AdminService from '../../services/AdminService';
 import { useAuth } from '../../context/AuthContext';
+import NotFoundPage from '../../context/NotFoundPage';
 
 interface Admin {
   adminId: number;
@@ -11,12 +12,14 @@ interface Admin {
 }
 
 const AdminProfile: React.FC = () => {
+  
   const [admin, setAdmin] = useState<Partial<Admin>>({});
   const [formData, setFormData] = useState<Partial<Admin>>({});
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const {user} = useAuth();
 
+  if(user?.role === "admin"){
   useEffect(() => {
     fetchAdmin();
   }, []);
@@ -138,6 +141,8 @@ const AdminProfile: React.FC = () => {
       </div>
     </div>
   );
+}else
+{return (<NotFoundPage/>)}
 };
 
 export default AdminProfile;

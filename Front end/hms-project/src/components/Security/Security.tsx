@@ -3,10 +3,11 @@ import {  Key, Loader, CheckCircle, XCircle } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import PatientLogin from '../../services/Login/PatientLogin';
 import DoctorLogin from '../../services/Login/DoctorLogin';
+import NotFoundPage from '../../context/NotFoundPage';
 
 const Security: React.FC = () => {
     const { user } = useAuth();
-
+  if(user?.role === "admin"){
   const [activeTab, setActiveTab] = useState<'doctor' | 'patient'>('doctor');
   const [identifier, setIdentifier] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
@@ -110,6 +111,9 @@ const Security: React.FC = () => {
       </div>
     </div>
   );
+}else{
+  return (<NotFoundPage/>)
+}
 };
 
 export default Security;

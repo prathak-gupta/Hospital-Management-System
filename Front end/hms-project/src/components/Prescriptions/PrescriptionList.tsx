@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import PrescriptionService from '../../services/PrescriptionService';
 import { User } from '../../types';
 import { Plus } from 'lucide-react';
-
+import { useAuth } from '../../context/AuthContext';
+import NotFoundPage from '../../context/NotFoundPage';
 
 interface Prescription {
   prescriptionId: number;
@@ -18,6 +19,8 @@ interface Prescription {
 }
 
 const PrescriptionList: React.FC = () => {
+  const {user} = useAuth();
+  if(user?.role ==="doctor"){
   const navigate = useNavigate();
   
   const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
@@ -29,17 +32,18 @@ const PrescriptionList: React.FC = () => {
   function getCurrentUser(): User | null {
     const userStr = localStorage.getItem('user');
     if (userStr) {
-        try {
-            return JSON.parse(userStr) as User;
-        } catch (ex) {
-            console.error('Error parsing user data:', ex);
-            return null;
-        }
+      try {
+        return JSON.parse(userStr) as User;
+      } catch (ex) {
+        console.error('Error parsing user data:', ex);
+        return null;
+      }
     }
     return null;
-}
+  }
+
   let doctorId = getCurrentUser()?.id;
-  console.log("Doctor ID: ",doctorId);
+  console.log("Doctor ID:", doctorId);
 
   useEffect(() => {
     fetchPrescriptions();
@@ -47,7 +51,7 @@ const PrescriptionList: React.FC = () => {
 
   const fetchPrescriptions = async () => {
     try {
-      const response = await PrescriptionService.getAllPrescriptionsByDoctor(doctorId||0);
+      const response = await PrescriptionService.getAllPrescriptionsByDoctor(doctorId || 0);
       setPrescriptions(response.data);
     } catch (error) {
       console.error('Error fetching prescriptions:', error);
@@ -56,10 +60,10 @@ const PrescriptionList: React.FC = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    
+    setFormData((prev) => ({ ...prev, [name]: value }));
+
     if (errors[name]) {
-      setErrors(prev => {
+      setErrors((prev) => {
         const newErrors = { ...prev };
         delete newErrors[name];
         return newErrors;
@@ -69,27 +73,27 @@ const PrescriptionList: React.FC = () => {
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-    
+
     if (!formData.patientId) {
       newErrors.patientID = 'Please enter patient ID';
     }
-    
+
     if (!formData.medicationName) {
       newErrors.medicationName = 'Please enter medication name';
     }
-    
+
     if (!formData.dosage) {
       newErrors.dosage = 'Please enter dosage';
     }
-    
+
     if (!formData.frequency) {
       newErrors.frequency = 'Please enter frequency';
     }
-    
+
     if (!formData.duration) {
       newErrors.duration = 'Please enter duration';
     }
-    
+
     if (!formData.issueDate) {
       newErrors.issueDate = 'Please select an issue date';
     }
@@ -100,14 +104,14 @@ const PrescriptionList: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (validateForm()) {
       try {
         formData.doctorId = doctorId;
         if (formData.prescriptionId) {
           await PrescriptionService.updatePrescription(formData as Prescription, formData.prescriptionId);
         } else {
-          console.log(formData)
+          console.log(formData);
           await PrescriptionService.registerPrescription(formData as Prescription);
         }
         fetchPrescriptions();
@@ -121,7 +125,7 @@ const PrescriptionList: React.FC = () => {
 
   const handleSearch = async () => {
     try {
-      const response = await PrescriptionService.searchPrescriptions(searchKeyword);
+      const response = await PrescriptionService.searchPrescriptions(searchKeyword, user.id);
       setPrescriptions(response.data);
     } catch (error) {
       console.error('Error searching prescriptions:', error);
@@ -148,10 +152,12 @@ const PrescriptionList: React.FC = () => {
           View, create, update, and search prescriptions.
         </p>
       </div>
-      
+
       <div className="px-4 py-5 sm:p-6">
-       <button onClick={openModalForNewEntry} className="btn btn-primary mb-4  flex justify-center items-center"> <Plus/> New Prescription </button>
-        
+        <button onClick={openModalForNewEntry} className="btn btn-primary mb-4 flex justify-center items-center">
+          <Plus /> New Prescription
+        </button>
+
         <div className="mb-4 flex space-x-3">
           <input
             type="text"
@@ -188,7 +194,7 @@ const PrescriptionList: React.FC = () => {
                   <td className="border px-4 py-2">{prescription.duration}</td>
                   <td className="border px-4 py-2">{prescription.issueDate}</td>
                   <td className="border px-4 py-2 flex space-x-2">
-                    <button onClick={() => openModalForEdit(prescription)} className="btn btn-outline  hover:bg-grey-800">Edit</button>
+                    <button onClick={() => openModalForEdit(prescription)} className="btn btn-outline hover:bg-grey-800">Edit</button>
                     <button onClick={() => PrescriptionService.deletePrescription(prescription.prescriptionId).then(fetchPrescriptions)} className="btn btn-danger bg-red-400 text-white hover:bg-red-800">Delete</button>
                   </td>
                 </tr>
@@ -210,6 +216,7 @@ const PrescriptionList: React.FC = () => {
             <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
               <form onSubmit={handleSubmit} className="px-4 py-5 sm:p-6">
                 <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                  {/* Patient ID */}
                   <div className="sm:col-span-3">
                     <label htmlFor="patientId" className="block text-sm font-medium text-gray-700">
                       Patient ID
@@ -365,17 +372,17 @@ const PrescriptionList: React.FC = () => {
 
                 </div>
 
-                <div className="mt-6 flex justify-end space-x-3">
+                <div className="mt-6 flex justify-end space-x3">
                   <button
-                    type="button"
+                    type='button'
                     onClick={() => setIsModalOpen(false)}
-                    className="btn btn-outline"
+                    className='btn btn-outline'
                   >
                     Cancel
                   </button>
                   <button
-                    type="submit"
-                    className="btn btn-primary"
+                    type='submit'
+                    className='btn btn-primary'
                   >
                     Save Prescription
                   </button>
@@ -387,6 +394,9 @@ const PrescriptionList: React.FC = () => {
       )}
     </div>
   );
+}else{
+  return (<NotFoundPage/>)
+}
 };
 
 export default PrescriptionList;

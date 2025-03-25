@@ -50,8 +50,8 @@ public class PrescriptionController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<Prescription>> searchPrescriptions(@RequestParam String keyword) {
-        List<Prescription> prescriptions = prescriptionService.searchPrescriptions(keyword);
+    public ResponseEntity<List<Prescription>> searchPrescriptions(@RequestParam String keyword, @RequestParam int id) {
+        List<Prescription> prescriptions = prescriptionService.searchPrescriptions(keyword, id);
         return ResponseEntity.ok(prescriptions);
     }
 
@@ -71,6 +71,16 @@ public class PrescriptionController {
     public ResponseEntity<List<Prescription>> getAllPrescriptionsByPatients(@PathVariable int patId) {
     	List<Prescription> prescriptions = prescriptionService.getAllPrescriptionsByPatients(patId);
         return ResponseEntity.ok(prescriptions);
+    }
+    
+    @GetMapping("/count-pres/{id}")
+    public int getAllPrescriptionsCountByPatients(@PathVariable int id) {
+    	return prescriptionService.getAllPrescriptionsCountByPatients(id);
+    }
+    
+    @GetMapping("/count-doc-pres/{id}")
+    public int getAllPrescriptionsCountByDoctor(@PathVariable int id) {
+    	return prescriptionService.getAllPrescriptionsCountByDoctor(id);
     }
 //    @GetMapping("/my-patients/{doctorId}")
 //    public ResponseEntity<List<Patient>> getPatientsByDoctor(@PathVariable int doctorId) {

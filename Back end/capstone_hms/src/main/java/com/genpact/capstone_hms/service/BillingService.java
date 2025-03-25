@@ -41,4 +41,7 @@ public class BillingService {
     	return billingRepository.getAllBillsByPatient(id);
     }
 
+    public int getAllBillCountByPatient(int patId) {
+    return billingRepository.getAllBillCountByPatient(patId);
+	}
 }

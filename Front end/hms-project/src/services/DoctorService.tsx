@@ -41,6 +41,10 @@ class DoctorService {
     return axios.get(`${API_URL}/search?keyword=${keyword}`);
   }
 
+  getAlldoctorsCount() {
+      return axios.get(`${API_URL}/all-count`);
+  }
+
 }
 
 export default new DoctorService();

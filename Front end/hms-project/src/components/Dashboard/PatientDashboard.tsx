@@ -1,13 +1,48 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Calendar, FileText, Pill, CreditCard, Activity, Clock, AlertCircle } from 'lucide-react';
 import { mockAppointments, mockPrescriptions, mockBills, mockLabReports } from '../../data/mockData';
 import { useAuth } from '../../context/AuthContext';
 import { format, parseISO, isAfter } from 'date-fns';
+import Appointment from '../../services/Appointment';
+import PrescriptionService from '../../services/PrescriptionService';
+import BillingService from '../../services/BillingService';
 
 const PatientDashboard: React.FC = () => {
   const { user } = useAuth();
   const patientId = user?.id;
   
+  const [totalAppointments, setTotalAppointments] = useState(0);
+  const [totalPrescription, setTotalPrescriptions] = useState(0);
+  const [totalBilling, setTotalBilling] = useState(0);
+
+
+  useEffect(() => {
+    const fetchTotalData = async () => {
+      try {
+        const count = (await Appointment.getAllAppointmentCountByPatients(user?.id)).data;
+        setTotalAppointments(count);
+      } catch (error) {
+        console.error('Error fetching total appointments:', error);
+      }
+
+      try {
+        const count = (await PrescriptionService.getAllBillCountByPatient(user?.id)).data;
+        setTotalPrescriptions(count);
+      } catch (error) {
+        console.error('Error fetching total appointments:', error);
+      }
+
+      
+      try {
+        const count = (await BillingService.getAllBillCountByPatient(user?.id)).data;
+        setTotalBilling(count);
+      } catch (error) {
+        console.error('Error fetching total appointments:', error);
+      }
+    };
+
+    fetchTotalData();
+  }, []);
   // Filter data for this patient
   const patientAppointments = mockAppointments.filter(a => a.patientId === patientId);
   const upcomingAppointments = patientAppointments.filter(a => {
@@ -45,7 +80,7 @@ const PatientDashboard: React.FC = () => {
                 <dl>
                   <dt className="text-sm font-medium text-gray-500 truncate">My Appointments</dt>
                   <dd>
-                    <div className="text-lg font-medium text-gray-900">{upcomingAppointments.length}</div>
+                    <div className="text-lg font-medium text-gray-900">{totalAppointments}</div>
                   </dd>
                 </dl>
               </div>
@@ -70,7 +105,7 @@ const PatientDashboard: React.FC = () => {
                 <dl>
                   <dt className="text-sm font-medium text-gray-500 truncate">My Prescriptions</dt>
                   <dd>
-                    <div className="text-lg font-medium text-gray-900">{patientPrescriptions.length}</div>
+                    <div className="text-lg font-medium text-gray-900">{totalPrescription}</div>
                   </dd>
                 </dl>
               </div>
@@ -95,7 +130,7 @@ const PatientDashboard: React.FC = () => {
                 <dl>
                   <dt className="text-sm font-medium text-gray-500 truncate">My Bills</dt>
                   <dd>
-                    <div className="text-lg font-medium text-gray-900">{pendingBills.length}</div>
+                    <div className="text-lg font-medium text-gray-900">{totalBilling}</div>
                   </dd>
                 </dl>
               </div>

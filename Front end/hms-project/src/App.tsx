@@ -25,10 +25,13 @@ import AdminProfile from './components/MyProfile/AdminProfile';
 import DoctorProfile from './components/MyProfile/DoctorProfile';
 import PatientProfile from './components/MyProfile/PatientProfile';
 import PatientPrescription from './components/Prescriptions/PatientPrescription';
+import MyAppointment from './components/Appointments/MyAppointments';
+import ViewAllAppointments from './components/Appointments/ViewAllAppointments';
+import NotFoundPage from './context/NotFoundPage';
 
 // Protected route component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading, user } = useAuth();
   
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
@@ -55,6 +58,7 @@ function App() {
               <MainLayout />
             </ProtectedRoute>
           }>
+
             <Route path="dashboard" element={<DashboardRouter />} />
             
             <Route path="appointments" element={<AppointmentCalendar />} />
@@ -62,7 +66,8 @@ function App() {
             
             <Route path="medical-records" element={<PatientRecords />} />
             <Route path="prescriptions" element={<PrescriptionList />} />
-            <Route path="billing" element={<PatientBilling />} />
+            <Route path="my-billing" element={<PatientBilling />} />
+            <Route path="billing" element={<BillingList />} />
             <Route path="all-billing" element={<BillingList />} />
             <Route path="lab-reports" element={<LabReportList />} />
             <Route path="notifications" element={<NotificationList />} />
@@ -75,6 +80,7 @@ function App() {
             <Route path="/patients" element={<ViewAllPatients />} />
             <Route path="/doctors" element={<ViewAllDoctors />} />
             <Route path="/security" element={<Security />} />
+
             <Route path="/ai-fracture-detector" element={<FractureDetector />} />
             <Route path="/derm-ai" element={<FractureDetector />} />
             <Route path="/ai-prescription-detector" element={<FractureDetector />} />
@@ -82,6 +88,9 @@ function App() {
             <Route path="/doctor_profile" element={<DoctorProfile />} />
             <Route path="/patient_profile" element={<PatientProfile />} />
             <Route path="/my-prescriptions" element={<PatientPrescription />} />
+            <Route path="/my-appointments" element={<MyAppointment />} />
+            <Route path="/all-appointments" element={<ViewAllAppointments />} />
+            <Route path="/404-not-found" element={<NotFoundPage />} />
             
             {/* Add more routes as needed */}
             <Route path="*" element={<div>Page not found</div>} />

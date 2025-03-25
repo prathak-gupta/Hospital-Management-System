@@ -140,6 +140,56 @@ public class AppointmentRepository {
             return null;
         }
     }
+    
+    public List<Appointment> getAllAppointmentsbyPatient(int patId) {
+        String sql = "SELECT * FROM Appointments WHERE patientId=?";
+        try {
+            return appointmentJdbc.query(sql, appointmentRowMapper, patId);
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public int getAllAppointmentCount() {
+        String sql = "SELECT COUNT(*) FROM Appointments";
+        try {
+            return appointmentJdbc.queryForObject(sql, Integer.class);
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    public int getAllAppointmentCountByPatients(int patId) {
+        String sql = "SELECT * FROM appointments WHERE patientID=?";
+        try {
+            List<Appointment> app= appointmentJdbc.query(sql,appointmentRowMapper,patId);
+            return app.size();
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+    
+      // for doctor dashboard..
+    public int getAllAppointmentsCountByDoctor(int docId) {
+        String sql = "SELECT * FROM appointments where doctorID=?";
+        try {
+            List<Appointment>app= appointmentJdbc.query(sql, appointmentRowMapper,docId);
+            return app.size();
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
+            e.printStackTrace();
+            return -1;
+        }
+    }
+    
+
 
 //    // Get Appointments by Doctor
 //    public List<Appointment> getAppointmentsByDoctor(int doctorId) {

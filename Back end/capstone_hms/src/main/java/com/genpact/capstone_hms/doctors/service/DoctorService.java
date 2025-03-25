@@ -95,4 +95,8 @@ public class DoctorService {
     public List<Doctor> getAllDoctors() {
         return doctorRepository.getAllDoctors();
     }
+    
+    public int getAllDoctorsCount() {
+    	return doctorRepository.getAllDoctorCount();
+    }
 }

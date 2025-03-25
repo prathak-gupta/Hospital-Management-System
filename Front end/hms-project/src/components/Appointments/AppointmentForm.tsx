@@ -5,6 +5,7 @@ import AppointmentService from '../../services/Appointment';
 import BillingService from '../../services/BillingService';
 import DoctorService from '../../services/DoctorService';
 import { useAuth } from '../../context/AuthContext';
+import NotFoundPage from '../../context/NotFoundPage';
 
 interface Doctor {
   doctorID: number;
@@ -22,6 +23,8 @@ interface Doctor {
 
 const AppointmentForm: React.FC = () => {
   const { user } = useAuth();
+
+  if(user?.role === "patient"){
   const navigate = useNavigate();
   
   const [formData, setFormData] = useState({
@@ -403,6 +406,9 @@ const AppointmentForm: React.FC = () => {
      </div>
 
    );
+  }else{
+    return (<NotFoundPage/>)
+  }
 
 };
 

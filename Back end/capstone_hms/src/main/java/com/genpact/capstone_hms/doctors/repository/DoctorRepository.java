@@ -4,6 +4,7 @@ import com.genpact.capstone_hms.doctors.model.Doctor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -122,5 +123,17 @@ public class DoctorRepository {
             return null;
         }
     }
+    
+    public int getAllDoctorCount() {
+        String sql = "SELECT COUNT(*) FROM doctors";
+        try {
+            return doctorJdbc.queryForObject(sql, Integer.class);
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
     
 }

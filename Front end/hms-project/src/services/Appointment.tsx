@@ -56,6 +56,22 @@ class AppointmentService {
   getPatientsByDoctor(docId: number): Promise<AxiosResponse<Patient[]>> {
     return axios.get(`${API_URL}/my-patients/${docId}`);
   }
+
+  getAppointmentsByPatient(patId: number): Promise<AxiosResponse<Appointment[]>>{
+    return axios.get(`${API_URL}/my-appointments/${patId}`);
+  }
+   getAllAppointmentCount() {
+    return axios.get(`${API_URL}/all-count`);
+}
+
+  getAllAppointmentCountByPatients(id:number){
+    return axios.get(`${API_URL}/count-appo/${id}`);
+  }
+
+  getAllAppointmentCountByDoctor(id:number){
+    return axios.get(`${API_URL}/count-doc-appo/${id}`);
+  }
+
 }
 
 export default new AppointmentService();

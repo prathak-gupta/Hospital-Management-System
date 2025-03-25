@@ -123,4 +123,16 @@ public class PatientRepository {
             return null;
         }
     }
+    
+    public int getAllPatientsCount() {
+        String sql = "SELECT COUNT(*) FROM patients";
+        try {
+            return patientJdbc.queryForObject(sql, Integer.class);
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
 }

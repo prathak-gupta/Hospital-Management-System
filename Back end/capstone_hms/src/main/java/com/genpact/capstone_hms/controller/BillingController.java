@@ -49,5 +49,12 @@ public class BillingController {
     public List<Billing> getAllBillsByPatient(@PathVariable int id){
     return billingService.getAllBillsByPatient(id);	
     }
+    
+    @GetMapping("/count-bills/{id}")
+    public int getAllBillCountByPatient(@PathVariable int id) {
+    return billingService.getAllBillCountByPatient(id);
+    
+    }
+
 
 }

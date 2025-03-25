@@ -35,9 +35,25 @@ class PrescriptionService {
     return axios.put(`${API_URL}/update/${id}`, prescription);
   }
 
-  searchPrescriptions(keyword: string): Promise<AxiosResponse<Prescription[]>> {
-    return axios.get(`${API_URL}/search?keyword=${keyword}`);
+
+  searchPrescriptions(keyword: string, doctorId: number): Promise<AxiosResponse<Prescription[]>> {
+    return axios.get(`${API_URL}/search`, {
+        params: {
+            keyword: keyword,
+            id: doctorId
+        }
+    });
   }
+  
+      getAllBillCountByPatient(id:number){
+        return axios.get(`${API_URL}/count-pres/${id}`);
+      }
+
+      getAllBillCountByDoctor(id:number){
+        return axios.get(`${API_URL}/count-doc-pres/${id}`);
+      }
+
+
 
   getAllPrescriptionsByDoctor(docId: number): Promise<AxiosResponse<Prescription[]>> {
     return axios.get(`${API_URL}/all/${docId}`);
@@ -46,6 +62,7 @@ class PrescriptionService {
   getAllPrescriptionsByPatient(patId: number): Promise<AxiosResponse<Prescription[]>> {
       return axios.get(`${API_URL}/my-prescriptions/${patId}`);
       }
+      
 }
 
 export default new PrescriptionService();

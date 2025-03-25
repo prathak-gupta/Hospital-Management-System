@@ -41,6 +41,9 @@ class BillingService {
   {
     return axios.get(`${API_URL}/my-bills/${id}`);
   }
+  getAllBillCountByPatient(id: number){
+    return axios.get(`${API_URL}/count-bills/${id}`);
+  }
 
 }
 

@@ -3,6 +3,7 @@ import { FileText, Download, Calendar, User, Plus } from 'lucide-react';
 import PrescriptionService from '../../services/PrescriptionService';
 import { useAuth } from '../../context/AuthContext';
 import jsPDF from 'jspdf';
+import NotFoundPage from '../../context/NotFoundPage';
 // import 'jspdf-autotable';
 
 interface Prescription {
@@ -19,6 +20,7 @@ interface Prescription {
 
 const PatientPrescription: React.FC = () => {
   const { user } = useAuth();
+  if(user?.role === "patient"){
   const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
   const [selectedRecord, setSelectedRecord] = useState<Prescription | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -253,6 +255,9 @@ const PatientPrescription: React.FC = () => {
       )}
     </div>
   );
+}else{
+  return (<NotFoundPage/>)
+}
 };
 
 export default PatientPrescription;

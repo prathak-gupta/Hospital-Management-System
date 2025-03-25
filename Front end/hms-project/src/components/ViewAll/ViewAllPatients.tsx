@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import PatientService from "../../services/PatientService";
 import { Grid, Table, Edit, Trash2, Plus } from "lucide-react";
- 
+import NotFoundPage from "../../context/NotFoundPage";
+import { useAuth } from "../../context/AuthContext";
+
 interface Patient {
   patientID: number;
   firstName: string;
@@ -15,112 +17,140 @@ interface Patient {
   emergencyContactPhone?: string;
   registrationDate: string;
 }
- 
+
 const ViewAllPatients: React.FC = () => {
+  const {user} = useAuth();
+  if(user?.role === "admin"){
   const [patients, setPatients] = useState<Patient[]>([]);
   const [viewMode, setViewMode] = useState<"table" | "card">("table");
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
- 
+  const [searchTerm, setSearchTerm] = useState<string>("");
+
   useEffect(() => {
+    fetchPatients();
+  }, []);
+
+  const fetchPatients = () => {
     PatientService.getAllPatients()
       .then(response => {
         setPatients(response.data);
-        console.log(response.data);
       })
       .catch(error => {
         console.log(error);
       });
-  }, []);
-  const [patientData, setPatientData] =useState<Patient>( {
-      "patientID": 0,
-      "firstName":"",
-      "lastName": "",
-      "dateOfBirth": "",
-      "gender": "",
-      "address": "",  
-      "phoneNumber": "",  
-      "email": "",
-      "emergencyContactName": "",
-      "emergencyContactPhone": "",
-      "registrationDate":" "  
-      });
+  };
+
+  const [patientData, setPatientData] = useState<Patient>({
+    patientID: 0,
+    firstName: "",
+    lastName: "",
+    dateOfBirth: "",
+    gender: "",
+    address: "",
+    phoneNumber: "",
+    email: "",
+    emergencyContactName: "",
+    emergencyContactPhone: "",
+    registrationDate: ""
+  });
+
   const handleEdit = (patient: Patient) => {
     setSelectedPatient(patient);
     setPatientData(patient);
   };
- 
+
   const handleDelete = (patientID: number) => {
-    console.log(`Delete patient with ID: ${patientID}`);
-    PatientService.deletePatient(patientID);
-    //PatientService.getAllPatients();
-    window.location.reload();
-    //alert("Doctor with id "+doctorID+ " deleted..");
+    PatientService.deletePatient(patientID).then(() => {
+      setPatients(patients.filter(patient => patient.patientID !== patientID));
+    });
   };
- 
+
   const closeModal = () => {
     setSelectedPatient(null);
     setIsAddModalOpen(false);
   };
-  const handleRegisterChange=(e: { target: { name: any; value: any; }; }) => {
-      setPatientData({...patientData, [e.target.name]: e.target.value });
+
+  const handleRegisterChange = (e: { target: { name: any; value: any; }; }) => {
+    setPatientData({ ...patientData, [e.target.name]: e.target.value });
+  };
+
+  const handleUpdateChange = (e: { target: { name: any; value: any; }; }) => {
+    setPatientData({ ...patientData, [e.target.name]: e.target.value });
+  };
+
+  const handleUpdateSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    closeModal();
+    if (validateForm()) {
+      PatientService.updatePatient(patientData, patientData.patientID).then(() => {
+        fetchPatients();
+      });
     }
-    const handleUpdateChange =(e: { target: {name: any; value: any; }; }) => {
-      setPatientData({...patientData, [e.target.name]: e.target.value });
+  };
+
+  const handleRegisterSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    closeModal();
+    if (validateForm()) {
+      PatientService.registerPatient(patientData).then(() => {
+        fetchPatients();
+      });
     }
-    const handleUpdateSubmit =(event: React.FormEvent) => {
-      event.preventDefault();
-      // fetch("http://localhost:5050/api/doctors/update/10", {
-      //method: 'PUT', // Specify the HTTP method
-      // // headers: {
-       //'Content-Type': 'application/json' // Set the content type to JSON
-       // //},
-       //body: JSON.stringify(doctorData)});
-       PatientService.updatePatient(patientData, patientData.patientID);
-       // DoctorService.updateDoctor (doctor, 1);
-       console.log("Update Form submitted");
-       closeModal();
-       window.location.reload();
-       // DoctorService.getAllDoctors();
-    };
-    const handleRegisterSubmit =(event: React.FormEvent) => {
-      event.preventDefault();
-       // fetch("http://localhost:5050/api/doctors/register", {
-       // //method: 'POST', // Specify the HTTP method
-       // headers: {
-      //'Content-Type': 'application/json' // Set the content type to JSON
-      //},
-      //body: JSON.stringify(doctorData)});
-      PatientService.registerPatient(patientData);
-      // DoctorService.updateDoctor (doctor, 1);
-      console.log("Register Form submitted");
-      closeModal();
-      window.location.reload();
-      // DoctorService.getAllDoctors();
-    };
- 
+  };
+
+  const validateForm = () => {
+    if (!patientData.firstName || !patientData.lastName || !patientData.email || !patientData.phoneNumber) {
+      alert("Please fill in all required fields.");
+      return false;
+    }
+    if (!/\S+@\S+\.\S+/.test(patientData.email)) {
+      alert("Please enter a valid email address.");
+      return false;
+    }
+    if (!/^\d{10}$/.test(patientData.phoneNumber)) {
+      alert("Please enter a valid phone number.");
+      return false;
+    }
+    return true;
+  };
+
+  const filteredPatients = patients.filter(patient =>
+    patient.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    patient.lastName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">All Patients</h1>
-      <div className="flex justify-end mb-4">
-        <button
-          className={"mr-2 text-green-700"}
-          onClick={() => setIsAddModalOpen(true)}
-        >
-          <Plus size={24} />
-        </button>
-        <button
-          className={`mr-2 ${viewMode === "table" ? "text-blue-600" : "text-gray-600"}`}
-          onClick={() => setViewMode("table")}
-        >
-          <Table size={24} />
-        </button>
-        <button
-          className={`${viewMode === "card" ? "text-blue-600" : "text-gray-600"}`}
-          onClick={() => setViewMode("card")}
-        >
-          <Grid size={24} className="mr-2" />
-        </button>
+      <div className="flex justify-between mb-4">
+        <input
+          type="text"
+          placeholder="Search..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="border border-gray-300 rounded-md p-2"
+        />
+        <div className="flex">
+          <button
+            className={"mr-2 text-green-700"}
+            onClick={() => setIsAddModalOpen(true)}
+          >
+            <Plus size={24} />
+          </button>
+          <button
+            className={`mr-2 ${viewMode === "table" ? "text-blue-600" : "text-gray-600"}`}
+            onClick={() => setViewMode("table")}
+          >
+            <Table size={24} />
+          </button>
+          <button
+            className={`${viewMode === "card" ? "text-blue-600" : "text-gray-600"}`}
+            onClick={() => setViewMode("card")}
+          >
+            <Grid size={24} className="mr-2" />
+          </button>
+        </div>
       </div>
       {viewMode === "table" ? (
         <div className="overflow-x-auto rounded-lg">
@@ -142,7 +172,7 @@ const ViewAllPatients: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {patients.map(patient => (
+              {filteredPatients.map(patient => (
                 <tr key={patient.patientID} className="hover:bg-gray-50">
                   <td className="py-2 px-4 border-b">{patient.patientID}</td>
                   <td className="py-2 px-4 border-b">{patient.firstName}</td>
@@ -176,7 +206,7 @@ const ViewAllPatients: React.FC = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {patients.map(patient => (
+          {filteredPatients.map(patient => (
             <div key={patient.patientID} className="bg-white p-4 rounded-lg shadow-md">
               <div className="flex justify-between items-center mb-2">
                 <h2 className="text-xl font-bold">{patient.firstName} {patient.lastName}</h2>
@@ -208,6 +238,7 @@ const ViewAllPatients: React.FC = () => {
           ))}
         </div>
       )}
+
       {selectedPatient && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-3/4 max-w-4xl relative">
@@ -312,139 +343,153 @@ const ViewAllPatients: React.FC = () => {
                 </div>
               </div>
               <div className="mt-4 flex justify-end space-x-2">
+              {/* Cancel Button */}
                 <button
-                  type="button"
-                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
-                  onClick={closeModal}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                >
-                  Submit
-                </button>
+                type="button"
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+                onClick={closeModal}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                onClick={handleUpdateSubmit}
+              >
+                Submit
+              </button>
+
               </div>
+
             </form>
+
           </div>
+
         </div>
+
       )}
+
       {isAddModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-3/4 max-w-4xl relative">
-            <button
-              className="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
-              onClick={closeModal}
-            >
-              &times;
-            </button>
-            <h2 className="text-2xl font-bold mb-4">Add Patient</h2>
-            <form onSubmit={handleRegisterSubmit}>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">First Name</label>
-                  <input
-                    type="text"
-                    name="firstName"
-                    onChange={handleRegisterChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Last Name</label>
-                  <input
-                    type="text"
-                    name="lastName"
-                    onChange={handleRegisterChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Date of Birth</label>
-                  <input
-                    type="date"
-                    name="dateOfBirth"
-                    onChange={handleRegisterChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Gender</label>
-                  <input
-                    type="text"
-                    name="gender"
-                    onChange={handleRegisterChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Address</label>
-                  <input
-                    type="text"
-                    name="address"
-                    onChange={handleRegisterChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Phone</label>
-                  <input
-                    type="text"
-                    name="phoneNumber"
-                    onChange={handleRegisterChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Email</label>
-                  <input
-                    type="email"
-                    name="email"
-                    onChange={handleRegisterChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Emergency Contact Name</label>
-                  <input
-                    type="text"
-                    name="emergencyContactName"
-                    onChange={handleRegisterChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Emergency Contact Phone</label>
-                  <input
-                    type="text"
-                    name="emergencyContactPhone"
-                    onChange={handleRegisterChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50"
-                  />
-                </div>
+        <div className="bg-white p-6 rounded-lg shadow-lg w-3/4 max-w-4xl relative">
+          <button
+            className="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
+            onClick={closeModal}
+          >
+            &times;
+          </button>
+          <h2 className="text-2xl font-bold mb-4">Add Patient</h2>
+          <form onSubmit={handleRegisterSubmit}>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">First Name</label>
+                <input
+                  type="text"
+                  name="firstName"
+                  onChange={handleRegisterChange}
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50"
+                />
               </div>
-              <div className="mt-4 flex justify-end space-x-2">
-                <button
-                  type="button"
-                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
-                  onClick={closeModal}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                >
-                  Submit
-                </button>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Last Name</label>
+                <input
+                  type="text"
+                  name="lastName"
+                  onChange={handleRegisterChange}
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50"
+                />
               </div>
-            </form>
-          </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Date of Birth</label>
+                <input
+                  type="date"
+                  name="dateOfBirth"
+                  onChange={handleRegisterChange}
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Gender</label>
+                <input
+                  type="text"
+                  name="gender"
+                  onChange={handleRegisterChange}
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Address</label>
+                <input
+                  type="text"
+                  name="address"
+                  onChange={handleRegisterChange}
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Phone</label>
+                <input
+                  type="text"
+                  name="phoneNumber"
+                  onChange={handleRegisterChange}
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  onChange={handleRegisterChange}
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Emergency Contact Name</label>
+                <input
+                  type="text"
+                  name="emergencyContactName"
+                  onChange={handleRegisterChange}
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Emergency Contact Phone</label>
+                <input
+                  type="text"
+                  name="emergencyContactPhone"
+                  onChange={handleRegisterChange}
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50"
+                />
+              </div>
+            </div>
+            <div className="mt-4 flex justify-end space-x-2">
+              <button
+                type="button"
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+                onClick={closeModal}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              >
+                Submit
+              </button>
+            </div>
+          </form>
         </div>
-      )}
+      </div>
+    )}
+
     </div>
+
   );
+}else{
+  return (<NotFoundPage/>)
+}
+
 };
- 
+
 export default ViewAllPatients;

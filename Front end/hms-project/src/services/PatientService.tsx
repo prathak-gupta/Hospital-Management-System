@@ -41,6 +41,10 @@ class PatientService {
     return axios.get(`${API_URL}/search?keyword=${keyword}`);
   }
 
+  getAllPatientsCount()
+  {
+    return axios.get(`${API_URL}/all-count`);
+  }
 }
  
 export default new PatientService();

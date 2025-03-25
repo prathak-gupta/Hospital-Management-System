@@ -100,4 +100,18 @@ public class BillingRepository {
             return null;
         }
     }
+    
+    public int getAllBillCountByPatient(int patId)
+    {
+    	String sql = "SELECT * FROM Billing where patientId=?";
+        try {
+            List<Billing> bill= billingJdbc.query(sql, billingRowMapper, patId);
+            return bill.size();
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
+            e.printStackTrace();
+            return -1;
+        }
+    }    	
+    
 }

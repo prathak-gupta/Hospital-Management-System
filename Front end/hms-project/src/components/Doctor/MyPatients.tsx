@@ -3,7 +3,9 @@ import PatientService from "../../services/PatientService";
 import { Grid, Table, Edit, Trash2, Plus } from "lucide-react";
 import { User } from "../../types";
 import AppointmentService from "../../services/Appointment";
- 
+import { useAuth } from "../../context/AuthContext";
+import NotFoundPage from "../../context/NotFoundPage";
+
 interface Patient {
   patientID: number;
   firstName: string;
@@ -23,7 +25,9 @@ const MyPatients: React.FC = () => {
   const [viewMode, setViewMode] = useState<"table" | "card">("table");
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
- 
+  const {user} = useAuth();
+  
+  if(user?.role === "doctor"){
   useEffect(() => {
     const userStr = localStorage.getItem('user');
     let user: User;
@@ -105,7 +109,7 @@ const MyPatients: React.FC = () => {
       window.location.reload();
       // DoctorService.getAllDoctors();
     };
- 
+  
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">All Patients</h1>
@@ -452,6 +456,9 @@ const MyPatients: React.FC = () => {
       )}
     </div>
   );
+}
+else
+return(<NotFoundPage/>)
 };
  
 export default MyPatients;

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import DoctorService from '../../services/DoctorService';
+import NotFoundPage from '../../context/NotFoundPage';
+import { useAuth } from '../../context/AuthContext';
 
 interface Doctor {
   doctorID: number;
@@ -20,7 +22,8 @@ const DoctorProfile: React.FC = () => {
   const [formData, setFormData] = useState<Partial<Doctor>>({});
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-
+  const {user} =useAuth();
+  if(user?.role === "doctor"){
   useEffect(() => {
     fetchDoctor();
   }, []);
@@ -257,6 +260,9 @@ const DoctorProfile: React.FC = () => {
        </div >
      </div >
    );
+  }else{
+    return (<NotFoundPage/>)
+  }
 };
 
 export default DoctorProfile;

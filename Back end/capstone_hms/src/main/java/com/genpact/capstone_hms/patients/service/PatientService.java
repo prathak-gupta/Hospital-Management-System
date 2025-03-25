@@ -93,4 +93,8 @@ public class PatientService {
     public List<Patient> getAllPatients() {
         return patientRepository.getAllPatients();
     }
+    
+    public int getAllPatientsCount() {
+    	return patientRepository.getAllPatientsCount();
+    }
 }

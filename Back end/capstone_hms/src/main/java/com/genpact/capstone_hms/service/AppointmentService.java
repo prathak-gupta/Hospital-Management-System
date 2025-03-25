@@ -52,4 +52,20 @@ public class AppointmentService {
     public List<Patient> getPatientsByDoctor(int doctorId) {
     	return appointmentRepository.getPatientsByDoctor(doctorId);
     }
+
+    public List<Appointment> getAllAppointmentsbyPatient(int patId) {
+    	return appointmentRepository.getAllAppointmentsbyPatient(patId);
+    }
+    
+    public int getAllAppointmentCount() {
+    	return appointmentRepository.getAllAppointmentCount();
+    }
+    
+    public int getAllAppointmentCountByPatients(int patId) {
+    	return appointmentRepository.getAllAppointmentCountByPatients(patId);
+    }
+    
+    public int getAllAppointmentsCountByDoctor(int docId) {
+    	return appointmentRepository.getAllAppointmentsCountByDoctor(docId);
+    }
 }

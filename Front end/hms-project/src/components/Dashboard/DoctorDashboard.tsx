@@ -1,13 +1,36 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Calendar, Users, ClipboardList, Clock, CheckCircle, AlertCircle } from 'lucide-react';
 import { mockAppointments, mockPatients, mockPrescriptions } from '../../data/mockData';
 import { useAuth } from '../../context/AuthContext';
 import { format } from 'date-fns';
+import PrescriptionService from '../../services/PrescriptionService';
+import Appointment from '../../services/Appointment';
 
 const DoctorDashboard: React.FC = () => {
   const { user } = useAuth();
   const doctorId = user?.id;
   
+  const [totalAppointment, setTotalAppointments] = useState(0);
+  const [totalPrescription, setTotalPrescriptions] = useState(0);
+
+  useEffect(() => {
+    const fetchTotalData = async () => {
+      try {
+        const count = (await Appointment.getAllAppointmentCountByDoctor(user?.id)).data;
+        setTotalAppointments(count);
+      } catch (error) {
+        console.error('Error fetching total appointments:', error);
+      }
+
+      try {
+        const count = (await PrescriptionService.getAllBillCountByDoctor(user?.id)).data;
+        setTotalPrescriptions(count);
+      } catch (error) {
+        console.error('Error fetching total appointments:', error);
+      }
+    };    fetchTotalData();
+  }, []);
+
   // Filter data for this doctor
   const doctorAppointments = mockAppointments.filter(a => a.doctorId === doctorId);
   const todayAppointments = doctorAppointments.filter(a => a.date === format(new Date(), 'yyyy-MM-dd'));
@@ -38,7 +61,7 @@ const DoctorDashboard: React.FC = () => {
                 <dl>
                   <dt className="text-sm font-medium text-gray-500 truncate">My Patients</dt>
                   <dd>
-                    <div className="text-lg font-medium text-gray-900">{doctorPatients.length}</div>
+                    <div className="text-lg font-medium text-gray-900">{totalAppointment}</div>
                   </dd>
                 </dl>
               </div>
@@ -53,7 +76,7 @@ const DoctorDashboard: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white overflow-hidden shadow rounded-lg">
+        {/* <div className="bg-white overflow-hidden shadow rounded-lg">
           <div className="p-5">
             <div className="flex items-center">
               <div className="flex-shrink-0 bg-green-100 rounded-md p-3">
@@ -76,7 +99,7 @@ const DoctorDashboard: React.FC = () => {
               </a>
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* <div className="bg-white overflow-hidden shadow rounded-lg">
           <div className="p-5">
@@ -113,7 +136,7 @@ const DoctorDashboard: React.FC = () => {
                 <dl>
                   <dt className="text-sm font-medium text-gray-500 truncate">Prescriptions</dt>
                   <dd>
-                    <div className="text-lg font-medium text-gray-900">{doctorPrescriptions.length}</div>
+                    <div className="text-lg font-medium text-gray-900">{totalPrescription}</div>
                   </dd>
                 </dl>
               </div>

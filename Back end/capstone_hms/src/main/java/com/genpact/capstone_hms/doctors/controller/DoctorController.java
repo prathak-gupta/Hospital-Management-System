@@ -57,4 +57,9 @@ public class DoctorController {
         List<Doctor> doctors = doctorService.getAllDoctors();
         return ResponseEntity.ok(doctors);
     }
+    
+    @GetMapping("/all-count")
+    public int getAllDoctorsCount() {
+        return doctorService.getAllDoctorsCount();
+    }
 }
