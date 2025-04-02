@@ -138,7 +138,7 @@ const PatientDashboard: React.FC = () => {
           </div>
           <div className="bg-gray-50 px-5 py-3">
             <div className="text-sm">
-              <a href="/billing" className="font-medium text-primary-600 hover:text-primary-900">
+              <a href="/my-billing" className="font-medium text-primary-600 hover:text-primary-900">
                 View bills
               </a>
             </div>

@@ -2,7 +2,8 @@ import React, { useEffect } from 'react';
 
 export default function DermAi() {
   useEffect(() => {
-    window.location.href = "https://skin-final-genpact.netlify.app/";
+    const newTab = window.open("https://skin-final-genpact.netlify.app/", "_blank");
+    return () => newTab.close();
   }, []);
 
   return (

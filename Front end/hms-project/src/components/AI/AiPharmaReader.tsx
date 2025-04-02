@@ -2,7 +2,8 @@ import React, { useEffect } from 'react';
 
 export default function AiPharmaReader() {
   useEffect(() => {
-    window.location.href = "https://prescription-genpact-final.netlify.app/";
+    const newTab = window.open("https://prescription-genpact-final.netlify.app/", "_blank");
+    return () => newTab.close();
   }, []);
 
   return (
