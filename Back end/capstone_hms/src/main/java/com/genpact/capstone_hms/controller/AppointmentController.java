@@ -72,6 +72,12 @@ public class AppointmentController {
     	return ResponseEntity.ok(appointments);
     }
     
+    @GetMapping("/doc-appo/{docId}")
+    public ResponseEntity<List<Appointment>> getAllAppointmentsbyDoctor(@PathVariable int docId) {
+    	List<Appointment> app = appointmentService.getAppointmentsByDoctor(docId);
+    	return ResponseEntity.ok(app);
+    }
+    
     @GetMapping("/all-count")
     public int getAllAppointmentCount() {
         return appointmentService.getAllAppointmentCount();

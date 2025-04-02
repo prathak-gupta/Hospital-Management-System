@@ -192,14 +192,14 @@ public class AppointmentRepository {
 
 
 //    // Get Appointments by Doctor
-//    public List<Appointment> getAppointmentsByDoctor(int doctorId) {
-//        String sql = "SELECT * FROM Appointments WHERE DoctorID = ?";
-//        try {
-//            return appointmentJdbc.query(sql, appointmentRowMapper, doctorId);
-//        } catch (Exception e) {
-//            System.err.println("Error: " + e.getMessage());
-//            e.printStackTrace();
-//            return null;
-//        }
-//    }
+    public List<Appointment> getAppointmentsByDoctor(int doctorId) {
+        String sql = "SELECT * FROM Appointments WHERE DoctorID = ?";
+        try {
+            return appointmentJdbc.query(sql, appointmentRowMapper, doctorId);
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

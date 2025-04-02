@@ -68,4 +68,8 @@ public class AppointmentService {
     public int getAllAppointmentsCountByDoctor(int docId) {
     	return appointmentRepository.getAllAppointmentsCountByDoctor(docId);
     }
+    
+    public List<Appointment> getAppointmentsByDoctor(int doctorId) {
+    	return appointmentRepository.getAppointmentsByDoctor(doctorId);
+    }
 }

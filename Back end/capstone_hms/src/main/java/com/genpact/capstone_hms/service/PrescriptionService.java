@@ -44,6 +44,10 @@ public class PrescriptionService {
         return prescriptionRepository.searchPrescriptions(keyword, docId);
     }
 
+    // Search Prescriptions
+    public List<Prescription> searchPrescriptionsPatients(String keyword, int patId) {
+        return prescriptionRepository.searchPrescriptionsPatients(keyword, patId);
+    }
     // Get All Prescriptions
     public List<Prescription> getAllPrescriptions() {
         return prescriptionRepository.getAllPrescriptions();

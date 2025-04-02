@@ -107,7 +107,7 @@ public class PrescriptionRepository {
 
     // Search Prescriptions
     public List<Prescription> searchPrescriptions(String keyword,int docId) {
-        String sql = "SELECT * FROM prescriptions WHERE doctorId=? && (medication_name LIKE ? OR notes LIKE ?)";
+        String sql = "SELECT * FROM prescriptions WHERE doctorId=? && medication_name LIKE ? OR notes LIKE ?";
         try {
             String formattedKeyword = "%" + keyword.trim().replaceAll("\\s+", " ") + "%";
             return prescriptionJdbc.query(sql, prescriptionRowMapper,docId, formattedKeyword, formattedKeyword);
@@ -118,6 +118,20 @@ public class PrescriptionRepository {
         }
     }
 
+    // Search Prescriptions
+    public List<Prescription> searchPrescriptionsPatients(String keyword,int patId) {
+        String sql = "SELECT * FROM prescriptions WHERE doctorId=? && medication_name LIKE ? OR notes LIKE ?";
+        try {
+            String formattedKeyword = "%" + keyword.trim().replaceAll("\\s+", " ") + "%";
+            return prescriptionJdbc.query(sql, prescriptionRowMapper,patId, formattedKeyword, formattedKeyword);
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    
     // Get All Prescriptions
     public List<Prescription> getAllPrescriptions() {
         String sql = "SELECT * FROM prescriptions";

@@ -54,6 +54,12 @@ public class PrescriptionController {
         List<Prescription> prescriptions = prescriptionService.searchPrescriptions(keyword, id);
         return ResponseEntity.ok(prescriptions);
     }
+    
+    @GetMapping("/search/patients")
+    public ResponseEntity<List<Prescription>> searchPrescriptionsPatients(@RequestParam String keyword, @RequestParam int id) {
+        List<Prescription> prescriptions = prescriptionService.searchPrescriptionsPatients(keyword, id);
+        return ResponseEntity.ok(prescriptions);
+    }
 
     @GetMapping("/all")
     public ResponseEntity<List<Prescription>> getAllPrescriptions() {
